@@ -1,0 +1,11 @@
+<launch>
+  
+  <node pkg="maxon_epos_driver" type="maxon_bringup" name="maxon_bringup" output="screen">
+    <param name="device" value="EPOS4" />
+    <param name="protocol" value="MAXON SERIAL V2" />
+    <param name="interface" value="USB" />
+    <param name="port" value="USB0" />
+    <param name="baudrate" value="10000" />
+  </node>
+
+</launch>

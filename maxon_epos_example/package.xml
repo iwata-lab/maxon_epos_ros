@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>maxon_epos_example</name>
+  <version>0.0.0</version>
+  <description>The maxon_epos_example package</description>
+
+  <maintainer email="taross0524.ss@gmail.com">Ryutaro Matsumoto</maintainer>
+
+
+  <license>MIT</license>
+
+
+  <author email="taross0524.ss@gmail.com">Ryutaro Matsumoto</author>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>maxon_epos_driver</exec_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>
