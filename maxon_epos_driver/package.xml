@@ -2,7 +2,7 @@
 <package format="2">
   <name>maxon_epos_driver</name>
   <version>0.0.0</version>
-  <description>The maxon_epos_sample package</description>
+  <description>The maxon_epos_driver package</description>
 
   <maintainer email="taross0524.ss@gmail.com">Ryutaro Matsumoto</maintainer>
 

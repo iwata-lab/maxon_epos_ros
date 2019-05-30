@@ -5,8 +5,8 @@
  * @date   2019-05-24 17:40:20
  */
 
-#include "maxon_epos_sample/Definitions.h"
-#include "maxon_epos_sample/EposCommunication.hpp"
+#include "maxon_epos_driver/Definitions.h"
+#include "maxon_epos_driver/EposCommunication.hpp"
 #include <ros/ros.h>
 #include <cmath>
 
