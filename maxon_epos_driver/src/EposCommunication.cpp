@@ -133,15 +133,14 @@ bool EposCommunication::OpenDevice()
 
 /**
  * @brief Set Default Connecting Paramters
- *      => TODO: Reading from args or params
  */
 void EposCommunication::SetDefaultParameters()
 {
-    m_device_name         = "EPOS2";
-    m_protocol_stack_name = "MAXON SERIAL V2";
-    m_interface_name      = "USB";
-    m_port_name           = "USB0";
-    m_baudrate            = 1000000;
+    m_nh.param<std::string>("device", m_device_name, "EPOS4");
+    m_nh.param<std::string>("Protocol", m_protocol_stack_name, "MAXON SERIAL V2");
+    m_nh.param<std::string>("interface", m_interface_name, "USB");
+    m_nh.param<std::string>("port", m_port_name, "USB0");
+    m_nh.param<int>("baudrate", m_baudrate, 1000000);
 
     g_usNodeId = 1;
 }

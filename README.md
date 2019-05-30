@@ -53,7 +53,7 @@ Otherwise, you can refer `maxon_epos_example` package's launch file.
     - "USB0", "USB1", ....
     - "CAN0", "CAN1", ....
 
-`baudrate` (int, default: 10000)
+`baudrate` (int, default: 1000000)
 
 - baudrate of communication via phisical interface
 
