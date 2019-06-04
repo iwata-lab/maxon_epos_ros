@@ -12,6 +12,7 @@
 
 #include <ros/ros.h>
 #include <map>
+#include <boost/foreach.hpp>
 
 
 // =============================================================================
@@ -22,7 +23,7 @@
 /**
  * @brief Constructor
  */
-DeviceInfo::DeviceInfo() : m_device_name(), m_protocol_stack(), m_interface_name(), m_port_name()
+DeviceInfo::DeviceInfo() : device_name(), protocol_stack(), interface_name(), port_name()
 {}
 
 /**
@@ -35,7 +36,7 @@ DeviceInfo::DeviceInfo() : m_device_name(), m_protocol_stack(), m_interface_name
  */
 DeviceInfo::DeviceInfo(const std::string &device_name, const std::string &protocol_stack,
                        const std::string &interface_name, const std::string &portname)
-    : m_device_name(device_name), m_protocol_stack(protocol_stack), m_interface_name(interface_name), m_port_name(portname)
+    : device_name(device_name), protocol_stack(protocol_stack), interface_name(interface_name), port_name(portname)
 {}
 
 /**
@@ -105,10 +106,10 @@ void* DeviceHandle::OpenDevice(const DeviceInfo &device_info)
 {
     unsigned int error_code;
     void* raw_device_ptr(
-            VCS_OpenDevice(const_cast<char*>(device_info.m_device_name.c_str()),
-                           const_cast<char*>(device_info.m_protocol_stack.c_str()),
-                           const_cast<char*>(device_info.m_interface_name.c_str()),
-                           const_cast<char*>(device_info.m_port_name.c_str()), &error_code));
+            VCS_OpenDevice(const_cast<char*>(device_info.device_name.c_str()),
+                           const_cast<char*>(device_info.protocol_stack.c_str()),
+                           const_cast<char*>(device_info.interface_name.c_str()),
+                           const_cast<char*>(device_info.port_name.c_str()), &error_code));
     if (!raw_device_ptr) {
         throw EposException("OpenDevice", error_code);
     }
@@ -136,7 +137,7 @@ void DeviceHandle::CloseDevice(void* raw_device_ptr)
 /**
  * @brief Constructor
  */
-NodeInfo::NodeInfo() : DeviceInfo(), m_node_id(0)
+NodeInfo::NodeInfo() : DeviceInfo(), node_id(0)
 {}
 
 /**
@@ -146,7 +147,7 @@ NodeInfo::NodeInfo() : DeviceInfo(), m_node_id(0)
  * @param node_id Node ID
  */
 NodeInfo::NodeInfo(const DeviceInfo &device_info, const unsigned short node_id)
-    : DeviceInfo(device_info), m_node_id(node_id)
+    : DeviceInfo(device_info), node_id(node_id)
 {}
 
 /**
@@ -163,7 +164,7 @@ NodeInfo::~NodeInfo()
 /**
  * @brief Constructor
  */
-NodeHandle::NodeHandle() : DeviceHandle(), m_node_id(0)
+NodeHandle::NodeHandle() : DeviceHandle(), node_id()
 {}
 
 /**
@@ -172,7 +173,7 @@ NodeHandle::NodeHandle() : DeviceHandle(), m_node_id(0)
  * @param node_info Node information
  */
 NodeHandle::NodeHandle(const NodeInfo &node_info)
-    : DeviceHandle(node_info), m_node_id(node_info.m_node_id)
+    : DeviceHandle(node_info), node_id(node_info.node_id)
 {}
 
 
@@ -183,7 +184,7 @@ NodeHandle::NodeHandle(const NodeInfo &node_info)
  * @param node_id Node ID
  */
 NodeHandle::NodeHandle(const DeviceHandle &device_handle, unsigned short node_id)
-    : DeviceHandle(device_handle), m_node_id(node_id)
+    : DeviceHandle(device_handle), node_id(node_id)
 {}
 
 /**
@@ -192,3 +193,47 @@ NodeHandle::NodeHandle(const DeviceHandle &device_handle, unsigned short node_id
 NodeHandle::~NodeHandle()
 {}
 
+
+// =============================================================================
+// Utils
+// =============================================================================
+
+std::vector<NodeInfo> EnumerateNodes(const DeviceInfo &device_info, const unsigned short node_id,
+                                     const unsigned short max_id)
+{
+    const std::vector<DeviceInfo> possible_device_infos(std::vector<DeviceInfo>(1, device_info));
+    std::vector<NodeInfo> possible_node_infos;
+    BOOST_FOREACH (const DeviceInfo &device_info, possible_device_infos)
+    {
+        if (node_id == 0) {
+            for (unsigned short possible_node_id = 1; possible_node_id < max_id; possible_node_id++) {
+                possible_node_infos.push_back(NodeInfo(device_info, possible_node_id));
+            }
+        } else {
+            possible_node_infos.push_back(NodeInfo(device_info, node_id));
+        }
+    }
+
+    std::vector<NodeInfo> existing_node_infos;
+    BOOST_FOREACH (const NodeInfo &possible_node_info, possible_node_infos)
+    {
+        try {
+            NodeInfo node_info(possible_node_info);
+            NodeHandle node_handle(node_info);
+            existing_node_infos.push_back(node_info);
+        } catch (const EposException &) {
+            // node does not exist
+            continue;
+        }
+    }
+    return existing_node_infos;
+}
+
+NodeHandle CreateEposHandle(const DeviceInfo &device_info, const unsigned short node_id)
+{
+    const std::vector<NodeInfo> node_infos(EnumerateNodes(device_info, node_id));
+    if (node_infos.size() == 1) {
+        return NodeHandle(node_infos.front());
+    }
+    throw  EposException("CreateEposHandle (Could not identify node)");
+}

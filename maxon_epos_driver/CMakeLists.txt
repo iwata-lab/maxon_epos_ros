@@ -126,6 +126,9 @@ add_library(${PROJECT_NAME}
     src/lib/EposManager.cpp
     src/lib/Device.cpp
     src/utils/EposException.cpp
+    src/lib/control/EposProfilePositionMode.cpp
+    src/lib/control/EposProfileVelocityMode.cpp
+    src/lib/control/EposCurrentMode.cpp
 )
 
 ## Add cmake target dependencies of the library

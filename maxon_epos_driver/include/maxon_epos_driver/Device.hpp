@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "maxon_epos_driver/utils/Macros.hpp"
 
 /**
  * @brief Information of device
@@ -23,10 +24,10 @@ public:
     virtual ~DeviceInfo();
 
 public:
-    std::string m_device_name;
-    std::string m_protocol_stack;
-    std::string m_interface_name;
-    std::string m_port_name;
+    std::string device_name;
+    std::string protocol_stack;
+    std::string interface_name;
+    std::string port_name;
 };
 
 
@@ -59,7 +60,7 @@ public:
     virtual ~NodeInfo();
 
 public:
-    unsigned short m_node_id;
+    unsigned short node_id;
 };
 
 
@@ -74,29 +75,37 @@ public:
     virtual ~NodeHandle();
 
 public:
-    unsigned short m_node_id;
+    unsigned short node_id;
 };
 
 
+/**
+ * @brief DeviceInfo Comparison
+ */
 struct CompareDeviceInfo
 {
     bool operator()(const DeviceInfo &a, const DeviceInfo &b)
     {
-        if (a.m_device_name != b.m_device_name)
+        if (a.device_name != b.device_name)
         {
-            return a.m_device_name < b.m_device_name;
+            return a.device_name < b.device_name;
         }
-        if (a.m_protocol_stack != b.m_protocol_stack)
+        if (a.protocol_stack != b.protocol_stack)
         {
-            return a.m_protocol_stack < b.m_protocol_stack;
+            return a.protocol_stack < b.protocol_stack;
         }
-        if (a.m_interface_name != b.m_interface_name)
+        if (a.interface_name != b.interface_name)
         {
-            return a.m_interface_name < b.m_interface_name;
+            return a.interface_name < b.interface_name;
         }
-        return a.m_port_name < b.m_port_name;
+        return a.port_name < b.port_name;
     }
 };
+
+
+NodeHandle CreateEposHandle(const DeviceInfo &device_info, const unsigned short node_id);
+std::vector<NodeInfo> EnumerateNodes(const DeviceInfo &device_info, const unsigned short node_id,
+                                     const unsigned short max_id = MAX_NODE_ID);
 
 
 #endif // _Device_HPP

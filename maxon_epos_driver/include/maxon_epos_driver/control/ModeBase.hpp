@@ -11,13 +11,14 @@
 #include <string>
 #include <vector>
 #include <ros/ros.h>
+#include "maxon_epos_driver/Device.hpp"
 
 class ModeBase {
 public:
-    ModeBase() {}
     virtual ~ModeBase() {}
 
-    virtual void init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const std::string &motor_name);
+    virtual void init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh,
+                      const std::string &motor_name, NodeHandle &node_handle) = 0;
 
     // activate operation mode
     virtual void activate() = 0;

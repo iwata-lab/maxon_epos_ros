@@ -11,6 +11,7 @@
 #include <string>
 #include <ros/ros.h>
 #include "maxon_epos_driver/Device.hpp"
+#include "maxon_epos_driver/control/ModeBase.hpp"
 
 
 class EposMotor {
@@ -27,9 +28,18 @@ public:
 private:
     void initEposDeviceHandle(ros::NodeHandle &motor_nh);
     void initProtocolStackChanges(ros::NodeHandle &motor_nh);
+    void initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh);
 
 private:
+
+    typedef boost::shared_ptr<ModeBase> ControlModePtr;
+    typedef std::map<std::string, ControlModePtr> ControlModeMap;
+
     std::string m_motor_name;
+
+    NodeHandle m_epos_handle;
+    ControlModePtr m_control_mode;
+    ControlModeMap m_control_mode_map;
 
     double m_position;
     double m_velocity;
