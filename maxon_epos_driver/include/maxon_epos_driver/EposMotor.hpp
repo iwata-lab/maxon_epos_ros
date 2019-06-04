@@ -10,6 +10,8 @@
 
 #include <string>
 #include <ros/ros.h>
+#include "maxon_epos_driver/Device.hpp"
+
 
 class EposMotor {
 public:
@@ -18,6 +20,13 @@ public:
 
     void init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh,
             const std::string &motor_name);
+
+    void read();
+    void write();
+
+private:
+    void initEposDeviceHandle(ros::NodeHandle &motor_nh);
+    void initProtocolStackChanges(ros::NodeHandle &motor_nh);
 
 private:
     std::string m_motor_name;

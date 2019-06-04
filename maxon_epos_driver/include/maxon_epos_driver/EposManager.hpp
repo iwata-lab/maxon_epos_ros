@@ -19,10 +19,14 @@ class EposManager {
 
 public:
     EposManager();
-    virtual ~EposManager();
+    virtual ~EposManager() throw();
 
     bool init(ros::NodeHandle &root_nh, ros::NodeHandle &motors_nh,
             const std::vector<std::string> &motor_names);
+
+    void read();
+
+    void write();
 
 private:
     std::vector< boost::shared_ptr< EposMotor >> m_motors;

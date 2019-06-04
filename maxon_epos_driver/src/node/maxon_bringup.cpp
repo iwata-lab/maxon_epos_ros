@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 {
     ros::init(argc, argv, "maxon_bringup");
     ros::NodeHandle nh;
-    ros::NodeHandle pnh("~");
+    ros::NodeHandle private_nh("~");
 
     std::vector<std::string> motor_names;
     ros::removeROSArgs(argc, argv, motor_names);
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 
     ros::Rate sleep_rate(50);
     EposManager manager;
-    if (!manager.init(nh, pnh, motor_names))
+    if (!manager.init(nh, private_nh, motor_names))
     {
         ROS_FATAL("Failed to initialize EposManager");
         return 1;

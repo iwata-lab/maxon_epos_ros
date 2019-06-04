@@ -124,6 +124,8 @@ add_library(${PROJECT_NAME}
     src/lib/EposCommunication.cpp
     src/lib/EposMotor.cpp
     src/lib/EposManager.cpp
+    src/lib/Device.cpp
+    src/utils/EposException.cpp
 )
 
 ## Add cmake target dependencies of the library

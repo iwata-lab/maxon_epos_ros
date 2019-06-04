@@ -18,11 +18,30 @@ EposMotor::EposMotor()
  */
 EposMotor::~EposMotor()
 {
-
 }
 
 
 void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const std::string &motor_name)
 {
     m_motor_name = motor_name;
+}
+
+void EposMotor::read()
+{
+
+}
+
+void EposMotor::write()
+{
+
+}
+
+void EposMotor::initEposDeviceHandle(ros::NodeHandle &motor_nh)
+{
+
+}
+
+void EposMotor::initProtocolStackChanges(ros::NodeHandle &motor_nh)
+{
+
 }
