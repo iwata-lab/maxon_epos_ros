@@ -38,7 +38,7 @@ bool EposManager::init(ros::NodeHandle &root_nh, ros::NodeHandle &motors_nh,
         // Copy constructor => ns = motors_nh's namespace + / + motor_name
         ros::NodeHandle motor_nh(motors_nh, motor_name);
 
-        boost::shared_ptr<EposMotor> motor(new EposMotor());
+        std::shared_ptr<EposMotor> motor(new EposMotor());
         motor->init(root_nh, motor_nh, motor_name);
         m_motors.push_back(motor);
     }
@@ -47,7 +47,7 @@ bool EposManager::init(ros::NodeHandle &root_nh, ros::NodeHandle &motors_nh,
 
 void EposManager::read()
 {
-    BOOST_FOREACH (const boost::shared_ptr<EposMotor> &motor, m_motors)
+    BOOST_FOREACH (const std::shared_ptr<EposMotor> &motor, m_motors)
     {
         motor->read();
     }
@@ -55,7 +55,7 @@ void EposManager::read()
 
 void EposManager::write()
 {
-    BOOST_FOREACH (const boost::shared_ptr<EposMotor> &motor, m_motors)
+    BOOST_FOREACH (const std::shared_ptr<EposMotor> &motor, m_motors)
     {
         motor->write();
     }

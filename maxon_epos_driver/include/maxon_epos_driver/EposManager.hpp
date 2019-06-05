@@ -11,7 +11,6 @@
 #include <string>
 #include <vector>
 #include <ros/ros.h>
-#include <boost/shared_ptr.hpp>
 
 #include "maxon_epos_driver/EposMotor.hpp"
 
@@ -19,7 +18,7 @@ class EposManager {
 
 public:
     EposManager();
-    virtual ~EposManager() throw();
+    virtual ~EposManager();
 
     bool init(ros::NodeHandle &root_nh, ros::NodeHandle &motors_nh,
             const std::vector<std::string> &motor_names);
@@ -29,7 +28,7 @@ public:
     void write();
 
 private:
-    std::vector< boost::shared_ptr< EposMotor >> m_motors;
+    std::vector<std::shared_ptr<EposMotor>> m_motors;
 
 };
 

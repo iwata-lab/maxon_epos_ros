@@ -10,7 +10,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "maxon_epos_driver/utils/Macros.hpp"
 
 /**
@@ -41,12 +41,12 @@ public:
     virtual ~DeviceHandle();
 
 private:
-    static boost::shared_ptr<void> MakePtr(const DeviceInfo &device_info);
+    static std::shared_ptr<void> MakePtr(const DeviceInfo &device_info);
     static void* OpenDevice(const DeviceInfo &device_info);
     static void CloseDevice(void *raw_device_ptr);
 
 public:
-    boost::shared_ptr<void> ptr;
+    std::shared_ptr<void> ptr;
 };
 
 
@@ -104,8 +104,6 @@ struct CompareDeviceInfo
 
 
 NodeHandle CreateEposHandle(const DeviceInfo &device_info, const unsigned short node_id);
-std::vector<NodeInfo> EnumerateNodes(const DeviceInfo &device_info, const unsigned short node_id,
-                                     const unsigned short max_id = MAX_NODE_ID);
 
 
 #endif // _Device_HPP

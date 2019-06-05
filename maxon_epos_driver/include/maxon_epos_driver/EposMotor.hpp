@@ -29,10 +29,14 @@ private:
     void initEposDeviceHandle(ros::NodeHandle &motor_nh);
     void initProtocolStackChanges(ros::NodeHandle &motor_nh);
     void initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh);
+    void initSensorParams(ros::NodeHandle &motor_nh);
+    void initMiscParams(ros::NodeHandle &motor_nh);
+
+    void ReadJointStates();
 
 private:
 
-    typedef boost::shared_ptr<ModeBase> ControlModePtr;
+    typedef std::shared_ptr<ModeBase> ControlModePtr;
     typedef std::map<std::string, ControlModePtr> ControlModeMap;
 
     std::string m_motor_name;
@@ -45,6 +49,9 @@ private:
     double m_velocity;
     double m_effort;
     double m_current;
+
+    int m_encoder_resolution;
+    bool m_use_ros_unit;
 };
 
 #endif // _EposMotor_HPP

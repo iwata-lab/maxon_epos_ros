@@ -77,12 +77,12 @@ DeviceHandle::~DeviceHandle()
  *
  * @return shared_ptr of device ptr
  */
-boost::shared_ptr<void> DeviceHandle::MakePtr(const DeviceInfo &device_info)
+std::shared_ptr<void> DeviceHandle::MakePtr(const DeviceInfo &device_info)
 {
-    static std::map<DeviceInfo, boost::weak_ptr<void>, CompareDeviceInfo> existing_device_ptrs;
+    static std::map<DeviceInfo, std::weak_ptr<void>, CompareDeviceInfo> existing_device_ptrs;
 
     // try to find an existing device
-    const boost::shared_ptr<void> existing_device_ptr(existing_device_ptrs[device_info].lock());
+    const std::shared_ptr<void> existing_device_ptr(existing_device_ptrs[device_info].lock());
     if (existing_device_ptr)
     {
         return existing_device_ptr;
@@ -90,7 +90,7 @@ boost::shared_ptr<void> DeviceHandle::MakePtr(const DeviceInfo &device_info)
 
     // open new device if not exist
     // Deleter is CloseDevice method
-    const boost::shared_ptr<void> new_device_ptr(OpenDevice(device_info), CloseDevice);
+    const std::shared_ptr<void> new_device_ptr(OpenDevice(device_info), CloseDevice);
     existing_device_ptrs[device_info] = new_device_ptr;
     return new_device_ptr;
 }
@@ -198,42 +198,27 @@ NodeHandle::~NodeHandle()
 // Utils
 // =============================================================================
 
-std::vector<NodeInfo> EnumerateNodes(const DeviceInfo &device_info, const unsigned short node_id,
-                                     const unsigned short max_id)
-{
-    const std::vector<DeviceInfo> possible_device_infos(std::vector<DeviceInfo>(1, device_info));
-    std::vector<NodeInfo> possible_node_infos;
-    BOOST_FOREACH (const DeviceInfo &device_info, possible_device_infos)
-    {
-        if (node_id == 0) {
-            for (unsigned short possible_node_id = 1; possible_node_id < max_id; possible_node_id++) {
-                possible_node_infos.push_back(NodeInfo(device_info, possible_node_id));
-            }
-        } else {
-            possible_node_infos.push_back(NodeInfo(device_info, node_id));
-        }
-    }
-
-    std::vector<NodeInfo> existing_node_infos;
-    BOOST_FOREACH (const NodeInfo &possible_node_info, possible_node_infos)
-    {
-        try {
-            NodeInfo node_info(possible_node_info);
-            NodeHandle node_handle(node_info);
-            existing_node_infos.push_back(node_info);
-        } catch (const EposException &) {
-            // node does not exist
-            continue;
-        }
-    }
-    return existing_node_infos;
-}
-
+/**
+ * @brief Create Epos Node Handle
+ *
+ * @param device_info DeviceInfo object
+ * @param node_id node_id of EPOS which is not 0
+ *
+ * @return created NodeHandle object
+ */
 NodeHandle CreateEposHandle(const DeviceInfo &device_info, const unsigned short node_id)
 {
-    const std::vector<NodeInfo> node_infos(EnumerateNodes(device_info, node_id));
-    if (node_infos.size() == 1) {
-        return NodeHandle(node_infos.front());
+    // TODO: support node_id == 0
+    if (node_id == 0) {
+        throw EposException("Invalid node_id");
     }
-    throw  EposException("CreateEposHandle (Could not identify node)");
+
+    try {
+        NodeInfo node_info(device_info, node_id);
+        NodeHandle node_handle(node_info);
+        return node_handle;
+    } catch (const EposException &e) {
+        ROS_ERROR_STREAM(e.what());
+        throw  EposException("CreateEposHandle (Could not identify node)");
+    }
 }
