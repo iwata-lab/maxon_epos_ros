@@ -13,11 +13,14 @@
 #include "maxon_epos_driver/control/EposProfileVelocityMode.hpp"
 #include "maxon_epos_driver/control/EposCurrentMode.hpp"
 
+#include <std_msgs/Float32.h>
+
 /**
  * @brief Constructor
  */
 EposMotor::EposMotor()
-    : m_position(0), m_velocity(0), m_effort(0), m_current(0) {}
+    : m_position(0), m_velocity(0), m_effort(0), m_current(0)
+{}
 
 /**
  * @brief Destructor
@@ -35,6 +38,9 @@ EposMotor::~EposMotor()
 
 void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const std::string &motor_name)
 {
+    m_position_publisher = motor_nh.advertise<std_msgs::Float32>("position", 1000);
+    m_velocity_publisher = motor_nh.advertise<std_msgs::Float32>("velocity", 1000);
+    m_current_publisher = motor_nh.advertise<std_msgs::Float32>("current", 1000);
     m_motor_name = motor_name;
     initEposDeviceHandle(motor_nh);
     initProtocolStackChanges(motor_nh);
@@ -58,6 +64,11 @@ void EposMotor::read()
     } catch (const EposException &e) {
         ROS_ERROR_STREAM(e.what());
     }
+    std_msgs::Float32 position_msg, velocity_msg, current_msg;
+    position_msg.data = m_position; velocity_msg.data = m_velocity; current_msg.data = m_current;
+    m_position_publisher.publish(position_msg);
+    m_velocity_publisher.publish(velocity_msg);
+    m_current_publisher.publish(current_msg);
 }
 
 void EposMotor::write()

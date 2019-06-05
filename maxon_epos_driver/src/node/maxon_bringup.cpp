@@ -17,8 +17,10 @@ int main(int argc, char** argv)
     ros::NodeHandle private_nh("~");
 
     std::vector<std::string> motor_names;
-    ros::removeROSArgs(argc, argv, motor_names);
-    motor_names.erase(motor_names.begin());
+    if (!private_nh.getParam("motor_names", motor_names)) {
+        ROS_FATAL("Failed to load motor_names");
+        return 1;
+    }
 
     ros::Rate sleep_rate(50);
     EposManager manager;
@@ -33,6 +35,7 @@ int main(int argc, char** argv)
     spinner.start();
 
     while (ros::ok()) {
+        manager.read();
         sleep_rate.sleep();
     }
 

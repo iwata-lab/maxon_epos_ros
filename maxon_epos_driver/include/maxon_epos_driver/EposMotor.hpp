@@ -50,6 +50,10 @@ private:
     double m_effort;
     double m_current;
 
+    ros::Publisher m_position_publisher;
+    ros::Publisher m_velocity_publisher;
+    ros::Publisher m_current_publisher;
+
     int m_encoder_resolution;
     bool m_use_ros_unit;
 };
