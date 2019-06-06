@@ -99,7 +99,7 @@ void EposMotor::initEposDeviceHandle(ros::NodeHandle &motor_nh)
     const unsigned short node_id(motor_nh.param("node_id", 0));
 
     // create epos handle
-    m_epos_handle = CreateEposHandle(device_info, node_id);
+    m_epos_handle = HandleManager::CreateEposHandle(device_info, node_id);
 }
 
 /**

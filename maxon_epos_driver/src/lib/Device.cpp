@@ -64,6 +64,9 @@ DeviceHandle::DeviceHandle() : ptr()
 DeviceHandle::DeviceHandle(const DeviceInfo &device_info) : ptr(MakePtr(device_info))
 {}
 
+DeviceHandle::DeviceHandle(const DeviceInfo& info, const std::shared_ptr<void> master_device_ptr) : ptr(MakeSubPtr(info, master_device_ptr))
+{}
+
 /**
  * @brief Destructor
  */
@@ -71,7 +74,7 @@ DeviceHandle::~DeviceHandle()
 {}
 
 /**
- * @brief Create device ptr if not exist, otherwise return existing ptr
+ * @brief Create master device ptr
  *
  * @param device_info Device information to create device handle
  *
@@ -79,20 +82,26 @@ DeviceHandle::~DeviceHandle()
  */
 std::shared_ptr<void> DeviceHandle::MakePtr(const DeviceInfo &device_info)
 {
-    static std::map<DeviceInfo, std::weak_ptr<void>, CompareDeviceInfo> existing_device_ptrs;
-
-    // try to find an existing device
-    const std::shared_ptr<void> existing_device_ptr(existing_device_ptrs[device_info].lock());
-    if (existing_device_ptr)
-    {
-        return existing_device_ptr;
-    }
-
-    // open new device if not exist
+    // open new master device if not exist
     // Deleter is CloseDevice method
     const std::shared_ptr<void> new_device_ptr(OpenDevice(device_info), CloseDevice);
-    existing_device_ptrs[device_info] = new_device_ptr;
     return new_device_ptr;
+}
+
+/**
+ * @brief Create sub device ptr
+ *
+ * @param device_info Device information to create device handle
+ * @param master_device_ptr shared_ptr of master device
+ *
+ * @return shared_ptr of sub device ptr
+ */
+std::shared_ptr<void> DeviceHandle::MakeSubPtr(const DeviceInfo &device_info, const std::shared_ptr<void> master_device_ptr)
+{
+    // open new sub device
+    // Deleter is CloseSubDevice method
+    const std::shared_ptr<void> new_subdevice_ptr(OpenSubDevice(device_info, master_device_ptr), CloseSubDevice);
+    return new_subdevice_ptr;
 }
 
 /**
@@ -117,15 +126,50 @@ void* DeviceHandle::OpenDevice(const DeviceInfo &device_info)
 }
 
 /**
+ * @brief Open Epos Sub Device
+ *
+ * @param device_info
+ *
+ * @return raw pointer of epos sub device
+ */
+void* DeviceHandle::OpenSubDevice(const DeviceInfo &device_info, const std::shared_ptr<void> master_device_ptr)
+{
+    unsigned int error_code;
+    void* raw_subdevice_ptr(
+            VCS_OpenSubDevice(master_device_ptr.get(),
+                              const_cast<char*>(device_info.device_name.c_str()),
+                              const_cast<char*>(device_info.protocol_stack.c_str()), &error_code));
+    if (!raw_subdevice_ptr) {
+        throw EposException("OpenSubDevice", error_code);
+    }
+    return raw_subdevice_ptr;
+}
+
+/**
  * @brief Close Epos Device
  *
  * @param raw_device_ptr Epos Device Handle
  */
 void DeviceHandle::CloseDevice(void* raw_device_ptr)
 {
+    ROS_INFO("Called CloseDevice");
     unsigned int error_code;
     if (VCS_CloseDevice(raw_device_ptr, &error_code) == VCS_FALSE) {
         ROS_ERROR_STREAM("CloseDevice (" + EposException::ToErrorInfo(error_code) + ")");
+    }
+}
+
+/**
+ * @brief Close Epos Sub Device
+ *
+ * @param raw_device_ptr Epos Sub Device Handle
+ */
+void DeviceHandle::CloseSubDevice(void *raw_device_ptr)
+{
+    ROS_INFO("Called CloseSubDevice");
+    unsigned int error_code;
+    if (VCS_CloseSubDevice(raw_device_ptr, &error_code) == VCS_FALSE) {
+        ROS_ERROR_STREAM("CloseSubDevice (" + EposException::ToErrorInfo(error_code) + ")");
     }
 }
 
@@ -176,6 +220,9 @@ NodeHandle::NodeHandle(const NodeInfo &node_info)
     : DeviceHandle(node_info), node_id(node_info.node_id)
 {}
 
+NodeHandle::NodeHandle(const NodeInfo &node_info, const DeviceHandle &device_handle)
+    : DeviceHandle(node_info, device_handle.ptr), node_id(node_info.node_id)
+{}
 
 /**
  * @brief Constructor
@@ -195,30 +242,62 @@ NodeHandle::~NodeHandle()
 
 
 // =============================================================================
-// Utils
+// HandleManager
 // =============================================================================
 
 /**
- * @brief Create Epos Node Handle
- *
- * @param device_info DeviceInfo object
- * @param node_id node_id of EPOS which is not 0
- *
- * @return created NodeHandle object
+ * @brief entity of m_master_handle
  */
-NodeHandle CreateEposHandle(const DeviceInfo &device_info, const unsigned short node_id)
+std::shared_ptr<NodeHandle> HandleManager::m_master_handle;
+/**
+ * @brief entity of m_sub_handles
+ */
+std::vector<std::shared_ptr<NodeHandle>> HandleManager::m_sub_handles;
+
+/**
+ * @brief Constructor
+ */
+HandleManager::HandleManager()
+{}
+
+/**
+ * @brief Destructor
+ */
+HandleManager::~HandleManager()
 {
-    // TODO: support node_id == 0
+    m_sub_handles.clear();
+    m_master_handle.reset();
+}
+
+NodeHandle HandleManager::CreateEposHandle(const DeviceInfo &device_info, const unsigned short node_id)
+{
     if (node_id == 0) {
         throw EposException("Invalid node_id");
     }
 
+    static std::map<DeviceInfo, std::weak_ptr<NodeHandle>, CompareDeviceInfo> existing_node_handles;
+
     try {
+        const std::shared_ptr<NodeHandle> existing_handle(existing_node_handles[device_info].lock());
+        if (existing_handle) {
+            return *existing_handle;
+        }
+
         NodeInfo node_info(device_info, node_id);
-        NodeHandle node_handle(node_info);
-        return node_handle;
+        if (!m_master_handle) {
+            // Create Master Handle
+            m_master_handle = std::make_shared<NodeHandle>(NodeHandle(node_info));
+            existing_node_handles[device_info] = m_master_handle;
+            return *m_master_handle;
+        } else {
+            // Create Sub Handle
+            const std::shared_ptr<NodeHandle> sub_handle = std::make_shared<NodeHandle>(NodeHandle(node_info, *m_master_handle));
+            m_sub_handles.push_back(sub_handle);
+            existing_node_handles[device_info] = sub_handle;
+            return *sub_handle;
+        }
     } catch (const EposException &e) {
         ROS_ERROR_STREAM(e.what());
-        throw  EposException("CreateEposHandle (Could not identify node)");
+        throw EposException("Create EposHandle (Could not identify node)");
     }
 }

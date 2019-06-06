@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 #include "maxon_epos_driver/utils/Macros.hpp"
 
 /**
@@ -28,54 +29,6 @@ public:
     std::string protocol_stack;
     std::string interface_name;
     std::string port_name;
-};
-
-
-/**
- * @brief Handle of device
- */
-class DeviceHandle {
-public:
-    DeviceHandle();
-    DeviceHandle(const DeviceInfo& info);
-    virtual ~DeviceHandle();
-
-private:
-    static std::shared_ptr<void> MakePtr(const DeviceInfo &device_info);
-    static void* OpenDevice(const DeviceInfo &device_info);
-    static void CloseDevice(void *raw_device_ptr);
-
-public:
-    std::shared_ptr<void> ptr;
-};
-
-
-/**
- * @brief Information of Node
- */
-class NodeInfo : public DeviceInfo {
-public:
-    NodeInfo();
-    NodeInfo(const DeviceInfo &device_info, const unsigned short node_id);
-    virtual ~NodeInfo();
-
-public:
-    unsigned short node_id;
-};
-
-
-/**
- * @brief Handle of node
- */
-class NodeHandle : public DeviceHandle {
-public:
-    NodeHandle();
-    NodeHandle(const NodeInfo &node_info);
-    NodeHandle(const DeviceHandle &device_handle, const unsigned short node_id);
-    virtual ~NodeHandle();
-
-public:
-    unsigned short node_id;
 };
 
 
@@ -103,7 +56,69 @@ struct CompareDeviceInfo
 };
 
 
-NodeHandle CreateEposHandle(const DeviceInfo &device_info, const unsigned short node_id);
+/**
+ * @brief Handle of device
+ */
+class DeviceHandle {
+public:
+    DeviceHandle();
+    DeviceHandle(const DeviceInfo& info);
+    DeviceHandle(const DeviceInfo& info, const std::shared_ptr<void> master_device_ptr);
+    virtual ~DeviceHandle();
+
+private:
+    static std::shared_ptr<void> MakePtr(const DeviceInfo &device_info);
+    static std::shared_ptr<void> MakeSubPtr(const DeviceInfo &device_info, const std::shared_ptr<void> master_device_ptr);
+    static void* OpenDevice(const DeviceInfo &device_info);
+    static void* OpenSubDevice(const DeviceInfo &device_info, const std::shared_ptr<void> master_device_ptr);
+    static void CloseDevice(void *raw_device_ptr);
+    static void CloseSubDevice(void *raw_device_ptr);
+
+public:
+    std::shared_ptr<void> ptr;
+};
+
+
+/**
+ * @brief Information of Node
+ */
+class NodeInfo : public DeviceInfo {
+public:
+    NodeInfo();
+    NodeInfo(const DeviceInfo &device_info, const unsigned short node_id);
+    virtual ~NodeInfo();
+
+public:
+    unsigned short node_id;
+};
+
+
+/**
+ * @brief Handle of node
+ */
+class NodeHandle : public DeviceHandle {
+public:
+    NodeHandle();
+    NodeHandle(const NodeInfo &node_info);
+    NodeHandle(const NodeInfo &node_info, const DeviceHandle &device_handle);
+    NodeHandle(const DeviceHandle &device_handle, const unsigned short node_id);
+    virtual ~NodeHandle();
+
+public:
+    unsigned short node_id;
+};
+
+
+class HandleManager {
+public:
+    HandleManager();
+    ~HandleManager();
+    static NodeHandle CreateEposHandle(const DeviceInfo &device_info, const unsigned short node_id);
+
+private:
+    static std::shared_ptr<NodeHandle> m_master_handle;
+    static std::vector<std::shared_ptr<NodeHandle>> m_sub_handles;
+};
 
 
 #endif // _Device_HPP
