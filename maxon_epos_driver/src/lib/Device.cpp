@@ -269,6 +269,16 @@ HandleManager::~HandleManager()
     m_master_handle.reset();
 }
 
+/**
+ * @brief Create Epos node handle
+ *        First time this method creates master handle
+ *        After second time creates sub handle
+ *
+ * @param device_info
+ * @param node_id
+ *
+ * @return 
+ */
 NodeHandle HandleManager::CreateEposHandle(const DeviceInfo &device_info, const unsigned short node_id)
 {
     if (node_id == 0) {
@@ -276,12 +286,14 @@ NodeHandle HandleManager::CreateEposHandle(const DeviceInfo &device_info, const 
     }
 
     NodeInfo node_info(device_info, node_id);
+    // record existing handles
     static std::map<NodeInfo, std::weak_ptr<NodeHandle>, CompareNodeInfo> existing_node_handles;
 
     try {
+        // check if handle already exists
         const std::shared_ptr<NodeHandle> existing_handle(existing_node_handles[node_info].lock());
         if (existing_handle) {
-            ROS_INFO("HOGE");
+            ROS_INFO("Found in existing handles");
             return *existing_handle;
         }
 

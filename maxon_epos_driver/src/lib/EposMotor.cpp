@@ -121,13 +121,6 @@ void EposMotor::initProtocolStackChanges(ros::NodeHandle &motor_nh)
         return;
     }
 
-    // 謎 => epos_handleの所有権が1のときっていつ?
-    if (m_epos_handle.ptr.use_count() != 1) {
-        ROS_WARN_STREAM(motor_nh.getNamespace() << "/{baudrate,timeout} is Ignored. "
-                << "Only the first initialized node in a device can set protocol_stack settings.");
-        return;
-    }
-
     if (baudrate > 0 && timeout > 0) {
         VCS_COMMAND(SetProtocolStackSettings, m_epos_handle.ptr.get(), baudrate, timeout);
     } else {
