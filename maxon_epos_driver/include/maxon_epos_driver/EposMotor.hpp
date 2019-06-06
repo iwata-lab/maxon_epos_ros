@@ -24,7 +24,7 @@ public:
             const std::string &motor_name);
 
     void read();
-    void write(const std_msgs::Float32::ConstPtr &msg);
+    void write(const float cmd);
 
 private:
     void initEposDeviceHandle(ros::NodeHandle &motor_nh);
@@ -35,6 +35,7 @@ private:
     void initMiscParams(ros::NodeHandle &motor_nh);
 
     void ReadJointStates();
+    void writeCallback(const std_msgs::Float32::ConstPtr &msg);
 
 private:
 

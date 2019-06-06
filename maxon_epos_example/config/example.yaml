@@ -53,9 +53,9 @@ test_motor:
 unchi_motor:
   # epos's node information (must be enough to identify the node)
   device: 'EPOS4' # default: 'EPOS4'
-  protocol_stack: 'MAXON SERIAL V2' # default: 'MAXON SERIAL V2'
-  interface: 'USB' # default: 'USB'
-  port: 'USB0' # default: 'USB0'
+  protocol_stack: 'CANopen' # default: 'MAXON SERIAL V2'
+  # interface: 'USB' # default: 'USB'
+  # port: 'USB0' # default: 'USB0'
   node_id: 2 # default: 0 (invalid)
 
   # communication settings (optional)

@@ -59,10 +59,7 @@ void EposManager::read()
 void EposManager::write(const std_msgs::Float32MultiArray::ConstPtr& msg)
 {
     for (int i = 0; i < m_motors.size(); i++) {
-        std_msgs::Float32 cmd;
-        cmd.data = msg->data[i];
         ROS_INFO_STREAM("Send: " << msg->data[i]);
-        std_msgs::Float32::ConstPtr msg_cmd(&cmd);
-        m_motors[i]->write(msg_cmd);
+        m_motors[i]->write(msg->data[i]);
     }
 }

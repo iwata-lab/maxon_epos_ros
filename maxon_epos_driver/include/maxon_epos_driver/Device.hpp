@@ -32,29 +32,6 @@ public:
 };
 
 
-/**
- * @brief DeviceInfo Comparison
- */
-struct CompareDeviceInfo
-{
-    bool operator()(const DeviceInfo &a, const DeviceInfo &b)
-    {
-        if (a.device_name != b.device_name)
-        {
-            return a.device_name < b.device_name;
-        }
-        if (a.protocol_stack != b.protocol_stack)
-        {
-            return a.protocol_stack < b.protocol_stack;
-        }
-        if (a.interface_name != b.interface_name)
-        {
-            return a.interface_name < b.interface_name;
-        }
-        return a.port_name < b.port_name;
-    }
-};
-
 
 /**
  * @brief Handle of device
@@ -106,6 +83,29 @@ public:
 
 public:
     unsigned short node_id;
+};
+
+/**
+ * @brief DeviceInfo Comparison
+ */
+struct CompareNodeInfo
+{
+    bool operator()(const NodeInfo &a, const NodeInfo &b)
+    {
+        if (a.device_name != b.device_name) {
+            return a.device_name < b.device_name;
+        }
+        if (a.protocol_stack != b.protocol_stack) {
+            return a.protocol_stack < b.protocol_stack;
+        }
+        if (a.interface_name != b.interface_name) {
+            return a.interface_name < b.interface_name;
+        }
+        if (a.port_name != b.port_name) {
+            return a.port_name < b.port_name;
+        }
+        return a.node_id < b.node_id;
+    }
 };
 
 

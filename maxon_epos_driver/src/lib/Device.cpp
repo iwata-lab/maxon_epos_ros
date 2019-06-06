@@ -136,7 +136,7 @@ void* DeviceHandle::OpenSubDevice(const DeviceInfo &device_info, const std::shar
 {
     unsigned int error_code;
     void* raw_subdevice_ptr(
-            VCS_OpenSubDevice(master_device_ptr.get(),
+            VCS_OpenSubDevice(const_cast<void*>(master_device_ptr.get()),
                               const_cast<char*>(device_info.device_name.c_str()),
                               const_cast<char*>(device_info.protocol_stack.c_str()), &error_code));
     if (!raw_subdevice_ptr) {
@@ -275,25 +275,26 @@ NodeHandle HandleManager::CreateEposHandle(const DeviceInfo &device_info, const 
         throw EposException("Invalid node_id");
     }
 
-    static std::map<DeviceInfo, std::weak_ptr<NodeHandle>, CompareDeviceInfo> existing_node_handles;
+    NodeInfo node_info(device_info, node_id);
+    static std::map<NodeInfo, std::weak_ptr<NodeHandle>, CompareNodeInfo> existing_node_handles;
 
     try {
-        const std::shared_ptr<NodeHandle> existing_handle(existing_node_handles[device_info].lock());
+        const std::shared_ptr<NodeHandle> existing_handle(existing_node_handles[node_info].lock());
         if (existing_handle) {
+            ROS_INFO("HOGE");
             return *existing_handle;
         }
 
-        NodeInfo node_info(device_info, node_id);
         if (!m_master_handle) {
             // Create Master Handle
             m_master_handle = std::make_shared<NodeHandle>(NodeHandle(node_info));
-            existing_node_handles[device_info] = m_master_handle;
+            existing_node_handles[node_info] = m_master_handle;
             return *m_master_handle;
         } else {
             // Create Sub Handle
             const std::shared_ptr<NodeHandle> sub_handle = std::make_shared<NodeHandle>(NodeHandle(node_info, *m_master_handle));
             m_sub_handles.push_back(sub_handle);
-            existing_node_handles[device_info] = sub_handle;
+            existing_node_handles[node_info] = sub_handle;
             return *sub_handle;
         }
     } catch (const EposException &e) {

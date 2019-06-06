@@ -54,7 +54,7 @@ void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const 
     initMiscParams(motor_nh);
 
     VCS_NODE_COMMAND_NO_ARGS(SetEnableState, m_epos_handle);
-    m_position_subscriber = motor_nh.subscribe("position_command", 1000, &EposMotor::write, this);
+    m_position_subscriber = motor_nh.subscribe("position_command", 1000, &EposMotor::writeCallback, this);
 }
 
 void EposMotor::read()
@@ -74,15 +74,20 @@ void EposMotor::read()
     m_current_publisher.publish(current_msg);
 }
 
-void EposMotor::write(const std_msgs::Float32::ConstPtr &msg)
+void EposMotor::write(const float cmd)
 {
     try {
         if (m_control_mode) {
-            m_control_mode->write(msg->data);
+            m_control_mode->write(cmd);
         }
     } catch (const EposException &e) {
         ROS_ERROR_STREAM(e.what());
     }
+}
+
+void EposMotor::writeCallback(const std_msgs::Float32::ConstPtr &msg)
+{
+    write(msg->data);
 }
 
 /**
