@@ -44,16 +44,19 @@ bool EposManager::init(ros::NodeHandle &root_nh, ros::NodeHandle &motors_nh,
         m_motors.push_back(motor);
     }
 
-    m_all_position_subscriber = motors_nh.subscribe("all_position", 1000, &EposManager::write, this);
+    m_all_position_publisher = motors_nh.advertise<std_msgs::Float32MultiArray>("all_position/get", 100);
+    m_all_position_subscriber = motors_nh.subscribe("all_position/set", 100, &EposManager::write, this);
     return true;
 }
 
 void EposManager::read()
 {
+    std_msgs::Float32MultiArray msg;
     BOOST_FOREACH (const std::shared_ptr<EposMotor> &motor, m_motors)
     {
         motor->read();
     }
+    m_all_position_publisher.publish(msg);
 }
 
 void EposManager::write(const std_msgs::Float32MultiArray::ConstPtr& msg)

@@ -20,7 +20,7 @@ test_motor:
 
   # general parameters (optional)
   clear_faults: true # clear faults recorded in epos on startup (default: false)
-  use_ros_unit: false # use ros standard units (rad, rad/s, Nm) in hardware interfaces
+  use_ros_unit: true # use ros standard units (rad, rad/s, Nm) in hardware interfaces
                      # or epos standard units (quad count of encoder pulse(qc), rpm, mNm)
                      # (default: false)
 
@@ -39,7 +39,8 @@ test_motor:
   # encoder parameters (required)
   encoder:
     type: 1 # 1: INC 3CH, 2: INC 2CH, 4: SSI ABS BIN, 5: SSI ABS GRY
-    resolution: 512 # encoder resolution
+    resolution: 4096 # encoder resolution
+    gear_ratio: 312 # gear ratio of motor
     inverted_polarity: false
 
   # profile position mode configs (optional)
@@ -67,7 +68,7 @@ unchi_motor:
 
   # general parameters (optional)
   clear_faults: true # clear faults recorded in epos on startup (default: false)
-  use_ros_unit: false # use ros standard units (rad, rad/s, Nm) in hardware interfaces
+  use_ros_unit: true # use ros standard units (rad, rad/s, Nm) in hardware interfaces
                      # or epos standard units (quad count of encoder pulse(qc), rpm, mNm)
                      # (default: false)
 
@@ -86,7 +87,8 @@ unchi_motor:
   # sensor parameters (required)
   encoder:
     type: 1 # 1: INC 3CH, 2: INC 2CH, 4: SSI ABS BIN, 5: SSI ABS GRY
-    resolution: 512 # encoder resolution
+    resolution: 4096 # encoder resolution
+    gear_ratio: 312 # gear ratio of motor
     inverted_polarity: false
 
   # profile position mode configs (optional)

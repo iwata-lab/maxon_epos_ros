@@ -20,10 +20,10 @@ public:
     virtual void init(ros::NodeHandle &motor_nh, NodeHandle &node_handle);
     virtual void activate();
     virtual void read();
-    virtual void write(float cmd);
+    virtual void write(float radian);
 
 private:
-    int m_encoder_resolution;
+    int m_max_qc;
     double m_position_cmd;
 };
 

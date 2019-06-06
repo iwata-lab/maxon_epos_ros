@@ -26,6 +26,10 @@ public:
     void read();
     void write(const float cmd);
 
+    double ReadPosition();
+    double ReadVelocity();
+    double ReadCurrent();
+
 private:
     void initEposDeviceHandle(ros::NodeHandle &motor_nh);
     void initProtocolStackChanges(ros::NodeHandle &motor_nh);
@@ -34,7 +38,6 @@ private:
     void initProfilePosition(ros::NodeHandle &motor_nh);
     void initMiscParams(ros::NodeHandle &motor_nh);
 
-    void ReadJointStates();
     void writeCallback(const std_msgs::Float32::ConstPtr &msg);
 
 private:
@@ -54,12 +57,15 @@ private:
     double m_current;
 
     ros::Publisher m_position_publisher;
-    ros::Publisher m_velocity_publisher;
-    ros::Publisher m_current_publisher;
-
     ros::Subscriber m_position_subscriber;
 
-    int m_encoder_resolution;
+    ros::Publisher m_velocity_publisher;
+    ros::Subscriber m_velocity_subscriber;
+
+    ros::Publisher m_current_publisher;
+    ros::Subscriber m_current_subscriber;
+
+    int m_max_qc;
     bool m_use_ros_unit;
 };
 

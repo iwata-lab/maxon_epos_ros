@@ -38,9 +38,6 @@ EposMotor::~EposMotor()
 
 void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const std::string &motor_name)
 {
-    m_position_publisher = motor_nh.advertise<std_msgs::Float32>("position", 1000);
-    m_velocity_publisher = motor_nh.advertise<std_msgs::Float32>("velocity", 1000);
-    m_current_publisher = motor_nh.advertise<std_msgs::Float32>("current", 1000);
     m_motor_name = motor_name;
     initEposDeviceHandle(motor_nh);
     initProtocolStackChanges(motor_nh);
@@ -54,7 +51,11 @@ void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const 
     initMiscParams(motor_nh);
 
     VCS_NODE_COMMAND_NO_ARGS(SetEnableState, m_epos_handle);
-    m_position_subscriber = motor_nh.subscribe("position_command", 1000, &EposMotor::writeCallback, this);
+
+    m_position_publisher = motor_nh.advertise<std_msgs::Float32>("position/get", 1000);
+    m_position_subscriber = motor_nh.subscribe("position/set", 1000, &EposMotor::writeCallback, this);
+    m_velocity_publisher = motor_nh.advertise<std_msgs::Float32>("velocity/get", 1000);
+    m_current_publisher = motor_nh.advertise<std_msgs::Float32>("current/get", 1000);
 }
 
 void EposMotor::read()
@@ -63,15 +64,15 @@ void EposMotor::read()
         if (m_control_mode) {
             m_control_mode->read();
         }
-        ReadJointStates();
+        m_position = ReadPosition();
+        m_velocity = ReadVelocity();
+        m_current = ReadCurrent();
     } catch (const EposException &e) {
         ROS_ERROR_STREAM(e.what());
     }
-    std_msgs::Float32 position_msg, velocity_msg, current_msg;
-    position_msg.data = m_position; velocity_msg.data = m_velocity; current_msg.data = m_current;
+    std_msgs::Float32 position_msg;
+    position_msg.data = m_position;
     m_position_publisher.publish(position_msg);
-    m_velocity_publisher.publish(velocity_msg);
-    m_current_publisher.publish(current_msg);
 }
 
 void EposMotor::write(const float cmd)
@@ -165,14 +166,16 @@ void EposMotor::initEncoderParams(ros::NodeHandle &motor_nh)
     const int type(encoder_nh.param("type", 0));
     VCS_NODE_COMMAND(SetSensorType, m_epos_handle, type);
 
-    m_encoder_resolution = 0;
-
     if (type == 1 || type == 2) {
         // Incremental Encoder
-        int resolution = encoder_nh.param("resolution", 0);
-        bool inverted_polarity = encoder_nh.param("inverted_polarity", false);
+        const int resolution(encoder_nh.param("resolution", 0));
+        const int gear_ratio(encoder_nh.param("gear_ratio", 0));
+        if (resolution == 0 || gear_ratio == 0) {
+            throw EposException("Please set parameter 'resolution' and 'gear_ratio'");
+        }
+        const bool inverted_polarity(encoder_nh.param("inverted_polarity", false));
         VCS_NODE_COMMAND(SetIncEncoderParameter, m_epos_handle, resolution, inverted_polarity);
-        m_encoder_resolution = inverted_polarity ? -resolution : resolution;
+        m_max_qc = inverted_polarity ? -resolution * gear_ratio : resolution * gear_ratio;
     } else if (type == 4 || type == 5) {
         // SSI Abs Encoder
         bool inverted_polarity;
@@ -186,7 +189,7 @@ void EposMotor::initEncoderParams(ros::NodeHandle &motor_nh)
             ROS_ERROR("Please set 'data_rate', 'number_of_singleturn_bits', and 'number_of_multiturn_bits'");
         }
         VCS_NODE_COMMAND(SetSsiAbsEncoderParameter, m_epos_handle, data_rate, number_of_multiturn_bits, number_of_singleturn_bits, inverted_polarity);
-        m_encoder_resolution = inverted_polarity ? -(1 << number_of_singleturn_bits) : (1 << number_of_singleturn_bits);
+        m_max_qc = inverted_polarity ? -(1 << number_of_singleturn_bits) : (1 << number_of_singleturn_bits);
     } else {
         // Invalid Encoder
         throw EposException("Invalid Encoder Type: " + std::to_string(type));
@@ -218,27 +221,59 @@ void EposMotor::initMiscParams(ros::NodeHandle &motor_nh)
 
 
 /**
- * @brief Helper function for Read
+ * @brief Read Motor Position Function
+ *
+ * @return motor position
  */
-void EposMotor::ReadJointStates()
+double EposMotor::ReadPosition()
 {
-    int raw_position, raw_velocity;
-    short raw_current;
+    int raw_position;
+    double position;
     VCS_NODE_COMMAND(GetPositionIs, m_epos_handle, &raw_position);
-    VCS_NODE_COMMAND(GetVelocityIs, m_epos_handle, &raw_velocity);
-    VCS_NODE_COMMAND(GetCurrentIs, m_epos_handle, &raw_current);
-
     if (m_use_ros_unit) {
         // quad-counts of the encoder -> rad
-        m_position = raw_position * M_PI / (2. * m_encoder_resolution);
-        // rpm -> rad/s
-        m_velocity = raw_velocity * M_PI / 30.;
-        // mA -> A
-        m_current = raw_current / 1000.;
+        // m_position = raw_position * M_PI / (2. * m_encoder_resolution);
+        position = (raw_position / m_max_qc) * 2. * M_PI;
     } else {
-        m_position = raw_position;
-        m_velocity = raw_velocity;
-        // mA -> A
-        m_current = raw_current * 1000.;
+        position = raw_position;
     }
+    return position;
+}
+
+/**
+ * @brief Read Motor Velocity Function
+ *
+ * @return motor velocity
+ */
+double EposMotor::ReadVelocity()
+{
+    int raw_velocity;
+    double velocity;
+    VCS_NODE_COMMAND(GetVelocityIs, m_epos_handle, &raw_velocity);
+    if (m_use_ros_unit) {
+        // rpm -> rad/s
+        velocity = raw_velocity * M_PI / 30.;
+    } else {
+        velocity = raw_velocity;
+    }
+    return velocity;
+}
+
+/**
+ * @brief Read Motor Current Funciton
+ *
+ * @return motor current
+ */
+double EposMotor::ReadCurrent()
+{
+    short raw_current;
+    double current;
+    VCS_NODE_COMMAND(GetCurrentIs, m_epos_handle, &raw_current);
+    if (m_use_ros_unit) {
+        // mA -> A
+        current = raw_current / 1000.;
+    } else {
+        current = raw_current;
+    }
+    return current;
 }

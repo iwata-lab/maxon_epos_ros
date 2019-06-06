@@ -30,9 +30,8 @@ public:
 
 private:
     std::vector<std::shared_ptr<EposMotor>> m_motors;
+    ros::Publisher m_all_position_publisher;
     ros::Subscriber m_all_position_subscriber;
-    ros::Subscriber m_all_velocity_subscriber;
-    ros::Subscriber m_all_current_subscriber;
 };
 
 #endif // _EposManager_HPP
