@@ -26,7 +26,7 @@ public:
     virtual void read() = 0;
 
     // write commands of operation mode
-    virtual void write(float cmd) = 0;
+    virtual void write(const double position, const double velocity, const double current) = 0;
 
 protected:
     bool m_use_ros_unit;

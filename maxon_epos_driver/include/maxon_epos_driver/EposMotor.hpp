@@ -13,6 +13,7 @@
 #include <std_msgs/Float32.h>
 #include "maxon_epos_driver/Device.hpp"
 #include "maxon_epos_driver/control/ControlModeBase.hpp"
+#include "maxon_epos_msgs/MotorState.h"
 
 
 class EposMotor {
@@ -23,12 +24,8 @@ public:
     void init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh,
             const std::string &motor_name);
 
-    void read();
-    void write(const float cmd);
-
-    double ReadPosition();
-    double ReadVelocity();
-    double ReadCurrent();
+    maxon_epos_msgs::MotorState read();
+    void write(const double position, const double velocity, const double current);
 
 private:
     void initEposDeviceHandle(ros::NodeHandle &motor_nh);
@@ -38,7 +35,11 @@ private:
     void initProfilePosition(ros::NodeHandle &motor_nh);
     void initMiscParams(ros::NodeHandle &motor_nh);
 
-    void writeCallback(const std_msgs::Float32::ConstPtr &msg);
+    double ReadPosition();
+    double ReadVelocity();
+    double ReadCurrent();
+
+    void writeCallback(const maxon_epos_msgs::MotorState::ConstPtr &msg);
 
 private:
 
@@ -56,14 +57,8 @@ private:
     double m_effort;
     double m_current;
 
-    ros::Publisher m_position_publisher;
-    ros::Subscriber m_position_subscriber;
-
-    ros::Publisher m_velocity_publisher;
-    ros::Subscriber m_velocity_subscriber;
-
-    ros::Publisher m_current_publisher;
-    ros::Subscriber m_current_subscriber;
+    ros::Publisher m_state_publisher;
+    ros::Subscriber m_state_subscriber;
 
     int m_max_qc;
     bool m_use_ros_unit;

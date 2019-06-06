@@ -6,9 +6,10 @@
  */
 
 #include "maxon_epos_driver/EposManager.hpp"
+#include "maxon_epos_msgs/MotorState.h"
+#include "maxon_epos_msgs/MotorStates.h"
 
 #include <boost/foreach.hpp>
-#include <std_msgs/Float32MultiArray.h>
 
 /**
  * @brief Constructor
@@ -44,25 +45,26 @@ bool EposManager::init(ros::NodeHandle &root_nh, ros::NodeHandle &motors_nh,
         m_motors.push_back(motor);
     }
 
-    m_all_position_publisher = motors_nh.advertise<std_msgs::Float32MultiArray>("all_position/get", 100);
-    m_all_position_subscriber = motors_nh.subscribe("all_position/set", 100, &EposManager::write, this);
+    m_all_motor_publisher = motors_nh.advertise<maxon_epos_msgs::MotorStates>("get_all_states", 100);
+    m_all_motor_subscriber = motors_nh.subscribe("set_all_states", 100, &EposManager::write, this);
     return true;
 }
 
 void EposManager::read()
 {
-    std_msgs::Float32MultiArray msg;
+    maxon_epos_msgs::MotorStates msg;
     BOOST_FOREACH (const std::shared_ptr<EposMotor> &motor, m_motors)
     {
-        motor->read();
+        msg.states.push_back(motor->read());
     }
-    m_all_position_publisher.publish(msg);
+    m_all_motor_publisher.publish(msg);
 }
 
-void EposManager::write(const std_msgs::Float32MultiArray::ConstPtr& msg)
+void EposManager::write(const maxon_epos_msgs::MotorStates::ConstPtr& msg)
 {
     for (int i = 0; i < m_motors.size(); i++) {
-        ROS_INFO_STREAM("Send: " << msg->data[i]);
-        m_motors[i]->write(msg->data[i]);
+        maxon_epos_msgs::MotorState state = msg->states[i];
+        ROS_INFO_STREAM("Send: " << state.position);
+        m_motors[i]->write(state.position, state.velocity, state.current);
     }
 }

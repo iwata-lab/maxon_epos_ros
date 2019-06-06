@@ -13,7 +13,7 @@
 #include "maxon_epos_driver/control/EposProfileVelocityMode.hpp"
 #include "maxon_epos_driver/control/EposCurrentMode.hpp"
 
-#include <std_msgs/Float32.h>
+#include "maxon_epos_msgs/MotorState.h"
 
 /**
  * @brief Constructor
@@ -52,13 +52,11 @@ void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const 
 
     VCS_NODE_COMMAND_NO_ARGS(SetEnableState, m_epos_handle);
 
-    m_position_publisher = motor_nh.advertise<std_msgs::Float32>("position/get", 1000);
-    m_position_subscriber = motor_nh.subscribe("position/set", 1000, &EposMotor::writeCallback, this);
-    m_velocity_publisher = motor_nh.advertise<std_msgs::Float32>("velocity/get", 1000);
-    m_current_publisher = motor_nh.advertise<std_msgs::Float32>("current/get", 1000);
+    m_state_publisher = motor_nh.advertise<maxon_epos_msgs::MotorState>("get_state", 100);
+    m_state_subscriber = motor_nh.subscribe("set_state", 100, &EposMotor::writeCallback, this);
 }
 
-void EposMotor::read()
+maxon_epos_msgs::MotorState EposMotor::read()
 {
     try {
         if (m_control_mode) {
@@ -70,25 +68,29 @@ void EposMotor::read()
     } catch (const EposException &e) {
         ROS_ERROR_STREAM(e.what());
     }
-    std_msgs::Float32 position_msg;
-    position_msg.data = m_position;
-    m_position_publisher.publish(position_msg);
+    maxon_epos_msgs::MotorState msg;
+    msg.motor_name = m_motor_name;
+    msg.position = m_position;
+    msg.velocity = m_velocity;
+    msg.current = m_current;
+    m_state_publisher.publish(msg);
+    return msg;
 }
 
-void EposMotor::write(const float cmd)
+void EposMotor::write(const double position, const double velocity, const double current)
 {
     try {
         if (m_control_mode) {
-            m_control_mode->write(cmd);
+            m_control_mode->write(position, velocity, current);
         }
     } catch (const EposException &e) {
         ROS_ERROR_STREAM(e.what());
     }
 }
 
-void EposMotor::writeCallback(const std_msgs::Float32::ConstPtr &msg)
+void EposMotor::writeCallback(const maxon_epos_msgs::MotorState::ConstPtr &msg)
 {
-    write(msg->data);
+    write(msg->position, msg->velocity, msg->current);
 }
 
 /**

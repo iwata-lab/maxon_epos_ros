@@ -21,5 +21,5 @@ void EposProfileVelocityMode::activate()
 void EposProfileVelocityMode::read()
 {}
 
-void EposProfileVelocityMode::write(float cmd)
+void EposProfileVelocityMode::write(const double position, const double velocity, const double current)
 {}

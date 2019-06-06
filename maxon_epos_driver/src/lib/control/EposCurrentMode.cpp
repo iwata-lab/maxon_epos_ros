@@ -22,5 +22,5 @@ void EposCurrentMode::activate()
 void EposCurrentMode::read()
 {}
 
-void EposCurrentMode::write(float cmd)
+void EposCurrentMode::write(const double position, const double velocity, const double current)
 {}

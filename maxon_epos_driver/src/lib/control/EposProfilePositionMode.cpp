@@ -47,16 +47,16 @@ void EposProfilePositionMode::activate()
 void EposProfilePositionMode::read()
 {}
 
-void EposProfilePositionMode::write(float radian)
+void EposProfilePositionMode::write(const double position, const double velocity, const double current)
 {
     int quad_count;
-    ROS_INFO_STREAM("Target Radian: " << radian);
+    ROS_INFO_STREAM("Target Position: " << position);
     ROS_INFO_STREAM("Encoder Resolution: " << m_max_qc);
     if (m_use_ros_unit) {
-        // quad_count = static_cast<int>(radian * (2. * m_encoder_resolution) / M_PI);
-        quad_count = static_cast<int>((radian / (2 * M_PI)) * m_max_qc);
+        // quad_count = static_cast<int>(position * (2. * m_encoder_resolution) / M_PI);
+        quad_count = static_cast<int>((position / (2 * M_PI)) * m_max_qc);
     } else {
-        quad_count = static_cast<int>(radian);
+        quad_count = static_cast<int>(position);
     }
     ROS_INFO_STREAM("Send Quad Count: " << quad_count);
     VCS_NODE_COMMAND(MoveToPosition, m_epos_handle, quad_count, /* absolute */true, /* overwrite */true);

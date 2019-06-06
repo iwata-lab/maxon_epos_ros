@@ -11,9 +11,8 @@
 #include <string>
 #include <vector>
 #include <ros/ros.h>
-#include <std_msgs/Float32MultiArray.h>
-
 #include "maxon_epos_driver/EposMotor.hpp"
+#include "maxon_epos_msgs/MotorStates.h"
 
 class EposManager {
 
@@ -26,12 +25,12 @@ public:
 
     void read();
 
-    void write(const std_msgs::Float32MultiArray::ConstPtr& msg);
+    void write(const maxon_epos_msgs::MotorStates::ConstPtr& msg);
 
 private:
     std::vector<std::shared_ptr<EposMotor>> m_motors;
-    ros::Publisher m_all_position_publisher;
-    ros::Subscriber m_all_position_subscriber;
+    ros::Publisher m_all_motor_publisher;
+    ros::Subscriber m_all_motor_subscriber;
 };
 
 #endif // _EposManager_HPP
