@@ -13,12 +13,11 @@
 #include <ros/ros.h>
 #include "maxon_epos_driver/Device.hpp"
 
-class ModeBase {
+class ControlModeBase {
 public:
-    virtual ~ModeBase() {}
+    virtual ~ControlModeBase();
 
-    virtual void init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh,
-                      const std::string &motor_name, NodeHandle &node_handle) = 0;
+    virtual void init(ros::NodeHandle &motor_nh, NodeHandle &node_handle);
 
     // activate operation mode
     virtual void activate() = 0;
@@ -27,7 +26,11 @@ public:
     virtual void read() = 0;
 
     // write commands of operation mode
-    virtual void write() = 0;
+    virtual void write(float cmd) = 0;
+
+protected:
+    bool m_use_ros_unit;
+    NodeHandle m_epos_handle;
 };
 
 #endif // _ModeBase_HPP

@@ -10,8 +10,9 @@
 
 #include <string>
 #include <ros/ros.h>
+#include <std_msgs/Float32.h>
 #include "maxon_epos_driver/Device.hpp"
-#include "maxon_epos_driver/control/ModeBase.hpp"
+#include "maxon_epos_driver/control/ControlModeBase.hpp"
 
 
 class EposMotor {
@@ -23,20 +24,21 @@ public:
             const std::string &motor_name);
 
     void read();
-    void write();
+    void write(const std_msgs::Float32::ConstPtr &msg);
 
 private:
     void initEposDeviceHandle(ros::NodeHandle &motor_nh);
     void initProtocolStackChanges(ros::NodeHandle &motor_nh);
     void initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh);
-    void initSensorParams(ros::NodeHandle &motor_nh);
+    void initEncoderParams(ros::NodeHandle &motor_nh);
+    void initProfilePosition(ros::NodeHandle &motor_nh);
     void initMiscParams(ros::NodeHandle &motor_nh);
 
     void ReadJointStates();
 
 private:
 
-    typedef std::shared_ptr<ModeBase> ControlModePtr;
+    typedef std::shared_ptr<ControlModeBase> ControlModePtr;
     typedef std::map<std::string, ControlModePtr> ControlModeMap;
 
     std::string m_motor_name;
@@ -53,6 +55,8 @@ private:
     ros::Publisher m_position_publisher;
     ros::Publisher m_velocity_publisher;
     ros::Publisher m_current_publisher;
+
+    ros::Subscriber m_position_subscriber;
 
     int m_encoder_resolution;
     bool m_use_ros_unit;

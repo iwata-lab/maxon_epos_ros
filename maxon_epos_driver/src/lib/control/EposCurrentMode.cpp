@@ -11,8 +11,10 @@
 EposCurrentMode::~EposCurrentMode()
 {}
 
-void EposCurrentMode::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const std::string &motor_name, NodeHandle &node_handle)
-{}
+void EposCurrentMode::init(ros::NodeHandle &motor_nh, NodeHandle &node_handle)
+{
+    ControlModeBase::init(motor_nh, node_handle);
+}
 
 void EposCurrentMode::activate()
 {}
@@ -20,5 +22,5 @@ void EposCurrentMode::activate()
 void EposCurrentMode::read()
 {}
 
-void EposCurrentMode::write()
+void EposCurrentMode::write(float cmd)
 {}

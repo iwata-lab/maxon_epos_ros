@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <ros/ros.h>
+#include <std_msgs/Float32MultiArray.h>
 
 #include "maxon_epos_driver/EposMotor.hpp"
 
@@ -25,11 +26,13 @@ public:
 
     void read();
 
-    void write();
+    void write(const std_msgs::Float32MultiArray::ConstPtr& msg);
 
 private:
     std::vector<std::shared_ptr<EposMotor>> m_motors;
-
+    ros::Subscriber m_all_position_subscriber;
+    ros::Subscriber m_all_velocity_subscriber;
+    ros::Subscriber m_all_current_subscriber;
 };
 
 #endif // _EposManager_HPP

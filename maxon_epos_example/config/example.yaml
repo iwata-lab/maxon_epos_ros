@@ -20,7 +20,7 @@ test_motor:
 
   # general parameters (optional)
   clear_faults: true # clear faults recorded in epos on startup (default: false)
-  rw_ros_units: true # use ros standard units (rad, rad/s, Nm) in hardware interfaces
+  use_ros_unit: false # use ros standard units (rad, rad/s, Nm) in hardware interfaces
                      # or epos standard units (quad count of encoder pulse(qc), rpm, mNm)
                      # (default: false)
 
@@ -36,12 +36,19 @@ test_motor:
     thermal_time_constant: 4.92 # thermal time constant of motor widing [s]
     number_of_pole_pairs: 1 # EC only
 
-  # sensor parameters (required)
-  sensor:
+  # encoder parameters (required)
+  encoder:
     type: 1 # 1: INC 3CH, 2: INC 2CH, 4: SSI ABS BIN, 5: SSI ABS GRY
     resolution: 512 # encoder resolution
     inverted_polarity: false
 
+  # profile position mode configs (optional)
+  position_profile:
+    velocity: 10000 # [rpm]
+    acceleration: 8000 # [rpm/s]
+    deceleration: 9000 # [rpm/s]
+
+    
 # motor name
 unchi_motor:
   # epos's node information (must be enough to identify the node)
@@ -60,7 +67,7 @@ unchi_motor:
 
   # general parameters (optional)
   clear_faults: true # clear faults recorded in epos on startup (default: false)
-  rw_ros_units: true # use ros standard units (rad, rad/s, Nm) in hardware interfaces
+  use_ros_unit: false # use ros standard units (rad, rad/s, Nm) in hardware interfaces
                      # or epos standard units (quad count of encoder pulse(qc), rpm, mNm)
                      # (default: false)
 
@@ -77,7 +84,13 @@ unchi_motor:
     number_of_pole_pairs: 1 # EC only
 
   # sensor parameters (required)
-  sensor:
+  encoder:
     type: 1 # 1: INC 3CH, 2: INC 2CH, 4: SSI ABS BIN, 5: SSI ABS GRY
     resolution: 512 # encoder resolution
     inverted_polarity: false
+
+  # profile position mode configs (optional)
+  position_profile:
+    velocity: 10000 # [rpm]
+    acceleration: 8000 # [rpm/s]
+    deceleration: 9000 # [rpm/s]

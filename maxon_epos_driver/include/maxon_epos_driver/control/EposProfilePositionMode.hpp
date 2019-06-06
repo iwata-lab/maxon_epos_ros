@@ -8,22 +8,23 @@
 #ifndef _EposProfilePositionMode_HPP
 #define _EposProfilePositionMode_HPP
 
-#include "maxon_epos_driver/control/ModeBase.hpp"
+#include "maxon_epos_driver/control/ControlModeBase.hpp"
 #include "maxon_epos_driver/Device.hpp"
 #include <ros/ros.h>
 
 
-class EposProfilePositionMode : public ModeBase {
+class EposProfilePositionMode : public ControlModeBase {
 public:
     virtual ~EposProfilePositionMode();
 
-    virtual void init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const std::string &motor_name, NodeHandle &node_handle);
+    virtual void init(ros::NodeHandle &motor_nh, NodeHandle &node_handle);
     virtual void activate();
     virtual void read();
-    virtual void write();
+    virtual void write(float cmd);
 
 private:
-
+    int m_encoder_resolution;
+    double m_position_cmd;
 };
 
 #endif // _EposProfilePositionMode_HPP

@@ -10,8 +10,10 @@
 EposProfileVelocityMode::~EposProfileVelocityMode()
 {}
 
-void EposProfileVelocityMode::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const std::string &motor_name, NodeHandle &node_handle)
-{}
+void EposProfileVelocityMode::init(ros::NodeHandle &motor_nh, NodeHandle &node_handle)
+{
+    ControlModeBase::init(motor_nh, node_handle);
+}
 
 void EposProfileVelocityMode::activate()
 {}
@@ -19,5 +21,5 @@ void EposProfileVelocityMode::activate()
 void EposProfileVelocityMode::read()
 {}
 
-void EposProfileVelocityMode::write()
+void EposProfileVelocityMode::write(float cmd)
 {}

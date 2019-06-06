@@ -8,6 +8,7 @@
 #include "maxon_epos_driver/EposManager.hpp"
 
 #include <boost/foreach.hpp>
+#include <std_msgs/Float32MultiArray.h>
 
 /**
  * @brief Constructor
@@ -42,6 +43,8 @@ bool EposManager::init(ros::NodeHandle &root_nh, ros::NodeHandle &motors_nh,
         motor->init(root_nh, motor_nh, motor_name);
         m_motors.push_back(motor);
     }
+
+    m_all_position_subscriber = motors_nh.subscribe("all_position", 1000, &EposManager::write, this);
     return true;
 }
 
@@ -53,10 +56,13 @@ void EposManager::read()
     }
 }
 
-void EposManager::write()
+void EposManager::write(const std_msgs::Float32MultiArray::ConstPtr& msg)
 {
-    BOOST_FOREACH (const std::shared_ptr<EposMotor> &motor, m_motors)
-    {
-        motor->write();
+    for (int i = 0; i < m_motors.size(); i++) {
+        std_msgs::Float32 cmd;
+        cmd.data = msg->data[i];
+        ROS_INFO_STREAM("Send: " << msg->data[i]);
+        std_msgs::Float32::ConstPtr msg_cmd(&cmd);
+        m_motors[i]->write(msg_cmd);
     }
 }

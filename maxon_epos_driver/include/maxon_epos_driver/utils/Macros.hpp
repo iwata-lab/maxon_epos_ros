@@ -9,6 +9,7 @@
 #define _Macros_HPP
 
 #include "maxon_epos_driver/utils/EposException.hpp"
+#include "maxon_epos_driver/Definitions.h"
 
 
 // range of node_id [1, 127]

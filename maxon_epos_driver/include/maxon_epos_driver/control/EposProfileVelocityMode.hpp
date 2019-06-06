@@ -8,19 +8,19 @@
 #ifndef _EposProfileVelocityMode_HPP
 #define _EposProfileVelocityMode_HPP
 
-#include "maxon_epos_driver/control/ModeBase.hpp"
+#include "maxon_epos_driver/control/ControlModeBase.hpp"
 #include "maxon_epos_driver/Device.hpp"
 #include <ros/ros.h>
 
 
-class EposProfileVelocityMode : public ModeBase {
+class EposProfileVelocityMode : public ControlModeBase {
 public:
     virtual ~EposProfileVelocityMode();
 
-    virtual void init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const std::string &motor_name, NodeHandle &node_handle);
+    virtual void init(ros::NodeHandle &motor_nh, NodeHandle &node_handle);
     virtual void activate();
     virtual void read();
-    virtual void write();
+    virtual void write(float cmd);
 
 private:
 

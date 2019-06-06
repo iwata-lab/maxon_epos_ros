@@ -49,9 +49,12 @@ void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const 
     VCS_NODE_COMMAND_NO_ARGS(SetDisableState, m_epos_handle);
 
     initControlMode(root_nh, motor_nh);
+    initEncoderParams(motor_nh);
+    initProfilePosition(motor_nh);
     initMiscParams(motor_nh);
 
     VCS_NODE_COMMAND_NO_ARGS(SetEnableState, m_epos_handle);
+    m_position_subscriber = motor_nh.subscribe("position_command", 1000, &EposMotor::write, this);
 }
 
 void EposMotor::read()
@@ -71,9 +74,15 @@ void EposMotor::read()
     m_current_publisher.publish(current_msg);
 }
 
-void EposMotor::write()
+void EposMotor::write(const std_msgs::Float32::ConstPtr &msg)
 {
-
+    try {
+        if (m_control_mode) {
+            m_control_mode->write(msg->data);
+        }
+    } catch (const EposException &e) {
+        ROS_ERROR_STREAM(e.what());
+    }
 }
 
 /**
@@ -85,8 +94,8 @@ void EposMotor::initEposDeviceHandle(ros::NodeHandle &motor_nh)
 {
     const DeviceInfo device_info(motor_nh.param<std::string>("device", "EPOS4"),
                                  motor_nh.param<std::string>("protocol_stack", "MAXON SERIAL V2"),
-                                 motor_nh.param<std::string>("interface_name", "USB"),
-                                 motor_nh.param<std::string>("port_name", "USB0"));
+                                 motor_nh.param<std::string>("interface", "USB"),
+                                 motor_nh.param<std::string>("port", "USB0"));
     const unsigned short node_id(motor_nh.param("node_id", 0));
 
     // create epos handle
@@ -143,7 +152,7 @@ void EposMotor::initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor
     } else {
         throw EposException("Unsupported control mode (" + control_mode + ")");
     }
-    m_control_mode->init(root_nh, motor_nh, m_motor_name, m_epos_handle);
+    m_control_mode->init(motor_nh, m_epos_handle);
 }
 
 /**
@@ -151,42 +160,50 @@ void EposMotor::initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor
  *
  * @param motor_nh NodeHandle of motor
  */
-void EposMotor::initSensorParams(ros::NodeHandle &motor_nh)
+void EposMotor::initEncoderParams(ros::NodeHandle &motor_nh)
 {
-    ros::NodeHandle sensor_nh(motor_nh, "sensor");
+    ros::NodeHandle encoder_nh(motor_nh, "encoder");
     
-    int type;
-    sensor_nh.param("sensorType", type, 0);
+    const int type(encoder_nh.param("type", 0));
     VCS_NODE_COMMAND(SetSensorType, m_epos_handle, type);
 
     m_encoder_resolution = 0;
 
     if (type == 1 || type == 2) {
         // Incremental Encoder
-        bool inverted_polarity;
-        sensor_nh.param("resolution", m_encoder_resolution);
-        sensor_nh.param("inverted_polarity", inverted_polarity, false);
-        VCS_NODE_COMMAND(SetIncEncoderParameter, m_epos_handle, m_encoder_resolution, inverted_polarity);
-        if (inverted_polarity) {
-            m_encoder_resolution *= -1;
-        }
+        int resolution = encoder_nh.param("resolution", 0);
+        bool inverted_polarity = encoder_nh.param("inverted_polarity", false);
+        VCS_NODE_COMMAND(SetIncEncoderParameter, m_epos_handle, resolution, inverted_polarity);
+        m_encoder_resolution = inverted_polarity ? -resolution : resolution;
     } else if (type == 4 || type == 5) {
         // SSI Abs Encoder
         bool inverted_polarity;
         int data_rate, number_of_multiturn_bits, number_of_singleturn_bits;
-        sensor_nh.param("inverted_polarity", inverted_polarity, false);
-        sensor_nh.param("data_rate", data_rate);
-        sensor_nh.param("number_of_multiturn_bits", number_of_multiturn_bits);
-        sensor_nh.param("number_of_singleturn_bits", number_of_singleturn_bits);
-        VCS_NODE_COMMAND(SetSsiAbsEncoderParameter, m_epos_handle, data_rate, number_of_multiturn_bits, number_of_singleturn_bits, inverted_polarity);
-        if (inverted_polarity) {
-            m_encoder_resolution = -(1 << number_of_singleturn_bits);
+        encoder_nh.param("inverted_polarity", inverted_polarity, false);
+        if (encoder_nh.hasParam("data_rate") && encoder_nh.hasParam("number_of_singleturn_bits") && encoder_nh.hasParam("number_of_multiturn_bits")) {
+            encoder_nh.getParam("data_rate", data_rate);
+            encoder_nh.getParam("number_of_multiturn_bits", number_of_multiturn_bits);
+            encoder_nh.getParam("number_of_singleturn_bits", number_of_singleturn_bits);
         } else {
-            m_encoder_resolution = (1 << number_of_singleturn_bits);
+            ROS_ERROR("Please set 'data_rate', 'number_of_singleturn_bits', and 'number_of_multiturn_bits'");
         }
+        VCS_NODE_COMMAND(SetSsiAbsEncoderParameter, m_epos_handle, data_rate, number_of_multiturn_bits, number_of_singleturn_bits, inverted_polarity);
+        m_encoder_resolution = inverted_polarity ? -(1 << number_of_singleturn_bits) : (1 << number_of_singleturn_bits);
     } else {
         // Invalid Encoder
-        throw EposException("Invalid Sensor Type: " + std::to_string(type));
+        throw EposException("Invalid Encoder Type: " + std::to_string(type));
+    }
+}
+
+void EposMotor::initProfilePosition(ros::NodeHandle &motor_nh)
+{
+    ros::NodeHandle profile_position_nh(motor_nh, "profile_position");
+    if (profile_position_nh.hasParam("velocity")) {
+        int velocity, acceleration, deceleration;
+        profile_position_nh.getParam("velocity", velocity);
+        profile_position_nh.getParam("acceleration", acceleration);
+        profile_position_nh.getParam("deceleration", deceleration);
+        VCS_NODE_COMMAND(SetPositionProfile, m_epos_handle, velocity, acceleration, deceleration);
     }
 }
 
