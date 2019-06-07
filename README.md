@@ -4,7 +4,7 @@ This is a ROS package for Maxon motor & EPOS driver.
 
 ## Support Status
 This package is **WIP** now.<br/>
-v0.0.0 supports only one EPOS device.
+v1.0.0 supports multiple EPOS device.<br/>
 
 ## How to use
 
@@ -32,33 +32,29 @@ $ rosrun maxon_epos_driver maxon_bringup
 
 Otherwise, you can refer `maxon_epos_example` package's launch file.
 
+#### Topics
+
+- `~/<motor_name>/get_state` (msg: [maxon_epos_msgs/MotorState](maxon_epos_msgs/msg/MotorState.msg))
+
+    This topic keep publishing motor current state.
+
+- `~/<motor_name>/set_state` (msg: [maxon_epos_msgs/MotorState](maxon_epos_msgs/msg/MotorState.msg))
+
+    When you send the goal to epos, use this topic.
+
+- `~/get_all_state` (msg: [maxon_epos_msgs/MotorStates](maxon_epos_msgs/msg/MotorStates.msg))
+
+    This topic keep publishing all motors current states.
+
+- `~/set_all_state` (msg: [maxon_epos_msgs/MotorStates](maxon_epos_msgs/msg/MotorStates.msg))
+
+    When you send the goals to all epos motors, use this topic.
+
 #### Params
 
-`device` (string, default: "EPOS4")
-
-- type of device name such as "EPOS", "EPOS2", or "EPOS4"
-
-`protocol` (string, default: "MAXON SERIAL V2")
-
-- type of protocol stack such as "MAXON RS232", "MAXON SERIAL V2", or "CANopen"
-
-`interface` (string, default: "USB")
-
-- type of interface such as "USB" or "RS232"
-
-`port` (string, default: "USB0")
-
-- port name for connection such as
-    - "COM0", "COM1", ....
-    - "USB0", "USB1", ....
-    - "CAN0", "CAN1", ....
-
-`baudrate` (int, default: 1000000)
-
-- baudrate of communication via phisical interface
-
+see [maxon_epos_example/config/example.yaml](maxon_epos_example/config/example.yaml)
 
 ### Example
 
-see [maxon_epos_example/launch](maxon_epos_example/launch)
+see [maxon_epos_example/launch/example_maxon_epos.launch](maxon_epos_example/launch/example_maxon_epos.launch)
 
