@@ -1,9 +1,9 @@
 motor_names:
-  - test_motor
-  - unchi_motor
+  - master_motor
+  - sub_motor
 
 # motor name
-test_motor:
+master_motor:
   # epos's node information (must be enough to identify the node)
   device: 'EPOS4' # default: 'EPOS4'
   protocol_stack: 'MAXON SERIAL V2' # default: 'MAXON SERIAL V2'
@@ -12,14 +12,12 @@ test_motor:
   node_id: 1 # default: 0 (invalid)
 
   # communication settings (optional)
-  # ignored if another node belonging to the same device is already initialized.
   # 'device' is a set of types of device, protocol_stack, interface, and port.
   # order of node initialization is that of commandline arguments.
   baudrate: 1000000 # default: 0 (keep current baudrate)
   timeout: 500 # [ms], default: 0 (keep current timeout)
 
   # general parameters (optional)
-  clear_faults: true # clear faults recorded in epos on startup (default: false)
   use_ros_unit: true # use ros standard units (rad, rad/s, Nm) in hardware interfaces
                      # or epos standard units (quad count of encoder pulse(qc), rpm, mNm)
                      # (default: false)
@@ -27,20 +25,11 @@ test_motor:
   # epos's operation mode (required)
   control_mode: "profile_position"
 
-  # motor parameters (required)
-  motor:
-    type: 10 # 1: DC, 10: EC sinus, 11: EC block
-    nominal_current: 6.59 # [A]
-    max_output_current: 7.0 # [A]
-    torque_constant: 7.75 # [mNm/A]
-    thermal_time_constant: 4.92 # thermal time constant of motor widing [s]
-    number_of_pole_pairs: 1 # EC only
-
   # encoder parameters (required)
   encoder:
     type: 1 # 1: INC 3CH, 2: INC 2CH, 4: SSI ABS BIN, 5: SSI ABS GRY
     resolution: 1024 # encoder resolution
-    gear_ratio: 312 # gear ratio of motor
+    gear_ratio: 243 # gear ratio of motor
     inverted_polarity: false
 
   # profile position mode configs (optional)
@@ -49,9 +38,8 @@ test_motor:
     acceleration: 8000 # [rpm/s]
     deceleration: 9000 # [rpm/s]
 
-    
 # motor name
-unchi_motor:
+sub_motor:
   # epos's node information (must be enough to identify the node)
   device: 'EPOS4' # default: 'EPOS4'
   protocol_stack: 'CANopen' # default: 'MAXON SERIAL V2'
@@ -67,22 +55,12 @@ unchi_motor:
   timeout: 500 # [ms], default: 0 (keep current timeout)
 
   # general parameters (optional)
-  clear_faults: true # clear faults recorded in epos on startup (default: false)
   use_ros_unit: true # use ros standard units (rad, rad/s, Nm) in hardware interfaces
                      # or epos standard units (quad count of encoder pulse(qc), rpm, mNm)
                      # (default: false)
 
   # epos's operation mode (required)
   control_mode: "profile_position"
-
-  # motor parameters (required)
-  motor:
-    type: 10 # 1: DC, 10: EC sinus, 11: EC block
-    nominal_current: 6.59 # [A]
-    max_output_current: 7.0 # [A]
-    torque_constant: 7.75 # [mNm/A]
-    thermal_time_constant: 4.92 # thermal time constant of motor widing [s]
-    number_of_pole_pairs: 1 # EC only
 
   # sensor parameters (required)
   encoder:

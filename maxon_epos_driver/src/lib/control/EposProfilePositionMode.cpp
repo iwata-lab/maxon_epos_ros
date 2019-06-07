@@ -53,7 +53,6 @@ void EposProfilePositionMode::write(const double position, const double velocity
     ROS_INFO_STREAM("Target Position: " << position);
     ROS_INFO_STREAM("Encoder Resolution: " << m_max_qc);
     if (m_use_ros_unit) {
-        // quad_count = static_cast<int>(position * (2. * m_encoder_resolution) / M_PI);
         quad_count = static_cast<int>((position / (2 * M_PI)) * m_max_qc);
     } else {
         quad_count = static_cast<int>(position);
