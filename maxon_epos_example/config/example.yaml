@@ -39,7 +39,7 @@ test_motor:
   # encoder parameters (required)
   encoder:
     type: 1 # 1: INC 3CH, 2: INC 2CH, 4: SSI ABS BIN, 5: SSI ABS GRY
-    resolution: 4096 # encoder resolution
+    resolution: 1024 # encoder resolution
     gear_ratio: 312 # gear ratio of motor
     inverted_polarity: false
 
