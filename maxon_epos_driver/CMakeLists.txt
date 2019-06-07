@@ -122,11 +122,10 @@ include_directories(
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-    src/lib/EposCommunication.cpp
     src/lib/EposMotor.cpp
     src/lib/EposManager.cpp
     src/lib/Device.cpp
-    src/utils/EposException.cpp
+    src/lib/utils/EposException.cpp
     src/lib/control/ControlModeBase.cpp
     src/lib/control/EposProfilePositionMode.cpp
     src/lib/control/EposProfileVelocityMode.cpp
