@@ -40,11 +40,11 @@ void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const 
 {
     m_motor_name = motor_name;
     initEposDeviceHandle(motor_nh);
-    initProtocolStackChanges(motor_nh);
 
-    // これいる?
     VCS_NODE_COMMAND_NO_ARGS(SetDisableState, m_epos_handle);
 
+    initDeviceError();
+    initProtocolStackChanges(motor_nh);
     initControlMode(root_nh, motor_nh);
     initEncoderParams(motor_nh);
     initProfilePosition(motor_nh);
@@ -108,6 +108,29 @@ void EposMotor::initEposDeviceHandle(ros::NodeHandle &motor_nh)
 
     // create epos handle
     m_epos_handle = HandleManager::CreateEposHandle(device_info, node_id);
+}
+
+/**
+ * @brief Clear initial errors
+ */
+void EposMotor::initDeviceError()
+{
+    unsigned char num_of_device_errors;
+    // Get Current Error nums
+    VCS_NODE_COMMAND(GetNbOfDeviceError, m_epos_handle, &num_of_device_errors);
+    for (int i = 1; i <= num_of_device_errors; i++) {
+        unsigned int device_error_code;
+        VCS_NODE_COMMAND(GetDeviceErrorCode, m_epos_handle, i, &device_error_code);
+        ROS_WARN_STREAM("EPOS Device Error: 0x" << std::hex << device_error_code);
+    }
+
+    // Clear Errors
+    VCS_NODE_COMMAND_NO_ARGS(ClearFault, m_epos_handle);
+    // Get Current Error nums again
+    VCS_NODE_COMMAND(GetNbOfDeviceError, m_epos_handle, &num_of_device_errors);
+    if (num_of_device_errors > 0) {
+        throw EposException(m_motor_name + ": " + std::to_string(num_of_device_errors) + " faults uncleared");
+    }
 }
 
 /**
@@ -177,7 +200,9 @@ void EposMotor::initEncoderParams(ros::NodeHandle &motor_nh)
         }
         const bool inverted_polarity(encoder_nh.param("inverted_polarity", false));
         VCS_NODE_COMMAND(SetIncEncoderParameter, m_epos_handle, resolution, inverted_polarity);
+
         m_max_qc = inverted_polarity ? - 4 * resolution * gear_ratio : 4 * resolution * gear_ratio;
+
     } else if (type == 4 || type == 5) {
         // SSI Abs Encoder
         bool inverted_polarity;

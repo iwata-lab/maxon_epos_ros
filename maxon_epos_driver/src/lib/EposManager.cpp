@@ -64,7 +64,7 @@ void EposManager::write(const maxon_epos_msgs::MotorStates::ConstPtr& msg)
 {
     for (int i = 0; i < m_motors.size(); i++) {
         maxon_epos_msgs::MotorState state = msg->states[i];
-        ROS_INFO_STREAM("Send: " << state.position);
+        ROS_DEBUG_STREAM("Send: " << state.position);
         m_motors[i]->write(state.position, state.velocity, state.current);
     }
 }

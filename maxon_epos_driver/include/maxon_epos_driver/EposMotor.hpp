@@ -29,6 +29,7 @@ public:
 
 private:
     void initEposDeviceHandle(ros::NodeHandle &motor_nh);
+    void initDeviceError();
     void initProtocolStackChanges(ros::NodeHandle &motor_nh);
     void initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh);
     void initEncoderParams(ros::NodeHandle &motor_nh);
