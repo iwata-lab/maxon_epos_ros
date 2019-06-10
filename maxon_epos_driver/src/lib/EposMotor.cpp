@@ -199,9 +199,12 @@ void EposMotor::initEncoderParams(ros::NodeHandle &motor_nh)
             throw EposException("Please set parameter 'resolution' and 'gear_ratio'");
         }
         const bool inverted_polarity(encoder_nh.param("inverted_polarity", false));
+        if (inverted_polarity) {
+            ROS_INFO_STREAM("Inverted polarity is True");
+        }
         VCS_NODE_COMMAND(SetIncEncoderParameter, m_epos_handle, resolution, inverted_polarity);
 
-        m_max_qc = inverted_polarity ? - 4 * resolution * gear_ratio : 4 * resolution * gear_ratio;
+        m_max_qc = 4 * resolution * gear_ratio;
 
     } else if (type == 4 || type == 5) {
         // SSI Abs Encoder

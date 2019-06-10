@@ -26,7 +26,7 @@ void EposProfilePositionMode::init(ros::NodeHandle &motor_nh, NodeHandle &node_h
                 throw EposException("Please set parameter 'resolution' and 'gear_ratio'");
             }
             const bool inverted_polarity(encoder_nh.param("inverted_poloarity", false));
-            m_max_qc = inverted_polarity ? - 4 * resolution * gear_ratio : 4 * resolution * gear_ratio;
+            m_max_qc = 4 * resolution * gear_ratio;
         } else if (type == 4 || type == 5) {
             int number_of_singleturn_bits;
             bool inverted_polarity;
