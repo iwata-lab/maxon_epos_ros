@@ -200,7 +200,7 @@ void EposMotor::initEncoderParams(ros::NodeHandle &motor_nh)
         }
         const bool inverted_polarity(encoder_nh.param("inverted_polarity", false));
         if (inverted_polarity) {
-            ROS_INFO_STREAM("Inverted polarity is True");
+            ROS_INFO_STREAM(m_motor_name + ": Inverted polarity is True");
         }
         VCS_NODE_COMMAND(SetIncEncoderParameter, m_epos_handle, resolution, inverted_polarity);
 
