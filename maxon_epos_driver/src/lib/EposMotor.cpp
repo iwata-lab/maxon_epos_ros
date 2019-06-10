@@ -259,7 +259,7 @@ double EposMotor::ReadPosition()
     VCS_NODE_COMMAND(GetPositionIs, m_epos_handle, &raw_position);
     if (m_use_ros_unit) {
         // quad-counts of the encoder -> rad
-        position = (raw_position / m_max_qc) * 2. * M_PI;
+        position = (raw_position / static_cast<double>(m_max_qc)) * 2. * M_PI;
     } else {
         position = raw_position;
     }
