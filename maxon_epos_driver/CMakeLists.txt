@@ -10,6 +10,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  maxon_epos_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -121,7 +122,14 @@ include_directories(
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-    src/EposCommunication.cpp
+    src/lib/EposMotor.cpp
+    src/lib/EposManager.cpp
+    src/lib/Device.cpp
+    src/lib/utils/EposException.cpp
+    src/lib/control/ControlModeBase.cpp
+    src/lib/control/EposProfilePositionMode.cpp
+    src/lib/control/EposProfileVelocityMode.cpp
+    src/lib/control/EposCurrentMode.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -132,7 +140,7 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/maxon_bringup.cpp)
+add_executable(maxon_bringup src/node/maxon_bringup.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -142,14 +150,14 @@ add_executable(${PROJECT_NAME}_node src/maxon_bringup.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(maxon_bringup ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}
     ${catkin_LIBRARIES}
     EposCmd
 )
-target_link_libraries(${PROJECT_NAME}_node
+target_link_libraries(maxon_bringup
     ${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
