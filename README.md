@@ -1,6 +1,6 @@
 # Maxon EPOS Package
 
-This is a ROS package for Maxon motor & EPOS driver.
+This is a ROS/ROS2 package for Maxon motor & EPOS driver.
 
 ## Support Status
 This package is **WIP** now.<br/>
@@ -15,11 +15,11 @@ For detail, please look at [this official pdf](http://academy.maxonjapan.co.jp/w
 ### How to build
 Then you have to download this package into your ROS workspace.
 ```bash
-$ cd ~/catkin_ws/src
-$ git clone https://github.com/iwata-lab/maxon_epos_ros.git
-$ cd ~/catkin_ws
-$ catkin_make
-$ source ~/catkin_ws/devel/setup.bash
+$ cd ~/yourworkspace_ws/src
+$ git clone https://github.com/cristinaluna/maxon_epos_ros.git
+$ cd ~/yourworkspace_ws
+$ colcon build 
+$ source ~/yourworkspace_ws/install/setup.bash
 ```
 ### How to use nodes
 
@@ -27,7 +27,7 @@ $ source ~/catkin_ws/devel/setup.bash
 You can run nodes by console.<br/>
 `maxon_bringup` node reads params from ROS parameter server.
 ```bash
-$ rosrun maxon_epos_driver maxon_bringup
+$ ros2 run maxon_epos_driver maxon_bringup
 ```
 
 Otherwise, you can refer `maxon_epos_example` package's launch file.
