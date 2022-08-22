@@ -1,17 +1,20 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>maxon_epos_ros</name>
+  <name>maxon_epos_ros2</name>
   <version>0.0.0</version>
   <description>The maxon_epos_ros package</description>
 
   <maintainer email="taross0524.ss@gmail.com">Ryutaro Matsumoto</maintainer>
+  <maintainer email="cristina.luna@live.com">Cristina Luna</maintainer>
 
   <license>MIT</license>
 
   <author email="taross0524.ss@gmail.com">Ryutaro Matsumoto</author>
 
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <depend>message_package</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
