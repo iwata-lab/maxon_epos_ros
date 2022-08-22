@@ -1,20 +1,20 @@
 /**
  * @file   maxon_bringup
  * @brief  
- * @author arwtyxouymz
+ * @author arwtyxouymz -> revised by cristinaluna
  * @date   2019-05-24 17:49:41
  */
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.h>
 #include <vector>
 #include <string>
 #include "maxon_epos_driver/EposManager.hpp"
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "maxon_bringup");
-    ros::NodeHandle nh;
-    ros::NodeHandle private_nh("~");
+    rclcpp::init(argc, argv, "maxon_bringup");
+    rclcpp::NodeHandle nh;
+    rclcpp::NodeHandle private_nh("~");
 
     std::vector<std::string> motor_names;
     if (!private_nh.getParam("motor_names", motor_names)) {
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    ros::Rate sleep_rate(50);
+    rclcpp::Rate sleep_rate(50);
     EposManager manager;
     if (!manager.init(nh, private_nh, motor_names))
     {
@@ -31,10 +31,10 @@ int main(int argc, char** argv)
     }
     ROS_INFO("Motors Initialized");
 
-    ros::AsyncSpinner spinner(1);
+    rclcpp::AsyncSpinner spinner(1);
     spinner.start();
 
-    while (ros::ok()) {
+    while (rclcpp::ok()) {
         manager.read();
         sleep_rate.sleep();
     }
