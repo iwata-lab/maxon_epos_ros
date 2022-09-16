@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(maxon_epos_ros2)
+project(maxon_epos_ros2_cpp)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -29,12 +29,12 @@ set(dependencies
   rclcpp
   rclcpp_components
   sensor_msgs
-  stereo_msgs
   std_msgs
 )
 
 include_directories(
-  include
+  maxon_epos_driver
+  maxon_epos_msgs
   ${ament_INCLUDE_DIRS}
 )
 
@@ -56,7 +56,7 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME})
 
 
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} maxon_epos_ros2_cpp)
 
 install(DIRECTORY launch/ DESTINATION share/${PROJECT_NAME}/launch FILES_MATCHING PATTERN "*.py")
 

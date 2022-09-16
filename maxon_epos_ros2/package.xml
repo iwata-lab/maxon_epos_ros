@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>maxon_epos_ros2</name>
+  <name>maxon_epos_ros2_cpp</name>
   <version>0.0.0</version>
-  <description>The maxon_epos_ros package</description>
+  <description>The maxon_epos_ros2 package</description>
 
   <maintainer email="taross0524.ss@gmail.com">Ryutaro Matsumoto</maintainer>
   <maintainer email="cristina.luna@live.com">Cristina Luna</maintainer>

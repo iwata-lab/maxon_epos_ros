@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>maxon_epos_driver</name>
   <version>0.0.0</version>
   <description>The maxon_epos_driver package</description>
@@ -12,13 +12,13 @@
   <author email="taross0524.ss@gmail.com">Ryutaro Matsumoto</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roscpp</build_depend>
+  <build_depend>rclcpp</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>maxon_epos_msgs</build_depend>
-  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rclcpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <exec_depend>message_runtime</exec_depend>
-  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rclcpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>maxon_epos_msgs</exec_depend>
 
