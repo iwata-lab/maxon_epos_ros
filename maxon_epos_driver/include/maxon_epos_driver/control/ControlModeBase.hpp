@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include "rclcpp/rclcpp.hpp"
-#include "maxon_epos_driver/Device.hpp"
+#include "../Device.hpp"
 
 class ControlModeBase {
 public:

@@ -33,9 +33,9 @@ set(dependencies
 )
 
 include_directories(
-  maxon_epos_driver
   maxon_epos_msgs
-  ${ament_INCLUDE_DIRS}
+  maxon_epos_driver
+  maxon_epos_example
 )
 
 # Macro to create nodes easily
@@ -47,23 +47,14 @@ macro(add_node node_name node_src)
 endmacro() 
 
 # Create Cpp executable, create executable nodes here
-add_node(maxon_bringup src/node/maxon_bringup.cpp)
+add_node(maxon_epos_driver ../maxon_epos_driver/src/node/maxon_bringup.cpp)
+#add_executable(maxon_epos_driver src/node/maxon_bringup.cpp)
+ 
+ament_export_dependencies(rclcpp)
 
-# Install Cpp executables
-install(TARGETS
-  maxon_bringup
-  # Add all created nodes here
-  DESTINATION lib/${PROJECT_NAME})
+#target_link_libraries(${PROJECT_NAME} maxon_epos_driver)
 
 
-target_link_libraries(${PROJECT_NAME} maxon_epos_ros2_cpp)
-
-install(DIRECTORY launch/ DESTINATION share/${PROJECT_NAME}/launch FILES_MATCHING PATTERN "*.py")
-
-install(DIRECTORY config/ DESTINATION share/${PROJECT_NAME}/config )
-
-install(DIRECTORY urdf/ DESTINATION share/${PROJECT_NAME}/urdf )
-
-ament_auto_package(INSTALL_TO_SHARE launch)
+ament_package()
 
 

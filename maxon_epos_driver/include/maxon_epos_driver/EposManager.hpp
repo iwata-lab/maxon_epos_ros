@@ -10,9 +10,9 @@
 
 #include <string>
 #include <vector>
-#include <ros/ros.h>
-#include "maxon_epos_driver/EposMotor.hpp"
-#include "maxon_epos_msgs/MotorStates.h"
+#include <rclcpp/rclcpp.hpp>
+#include "EposMotor.hpp"
+#include "MotorStates.h"
 
 class EposManager {
 
@@ -20,7 +20,7 @@ public:
     EposManager();
     virtual ~EposManager();
 
-    bool init(ros::NodeHandle &root_nh, ros::NodeHandle &motors_nh,
+    bool init(rclcpp::NodeHandle &root_nh, rclcpp::NodeHandle &motors_nh,
             const std::vector<std::string> &motor_names);
 
     void read();
@@ -29,8 +29,8 @@ public:
 
 private:
     std::vector<std::shared_ptr<EposMotor>> m_motors;
-    ros::Publisher m_all_motor_publisher;
-    ros::Subscriber m_all_motor_subscriber;
+    rclcpp::Publisher m_all_motor_publisher;
+    rclcpp::Subscriber m_all_motor_subscriber;
 };
 
 #endif // _EposManager_HPP

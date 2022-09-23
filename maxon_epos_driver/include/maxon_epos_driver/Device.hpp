@@ -12,7 +12,7 @@
 #include <vector>
 #include <memory>
 #include <map>
-#include "maxon_epos_driver/utils/Macros.hpp"
+#include "utils/Macros.hpp"
 
 /**
  * @brief Information of device

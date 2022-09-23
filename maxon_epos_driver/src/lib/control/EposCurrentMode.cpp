@@ -11,7 +11,7 @@
 EposCurrentMode::~EposCurrentMode()
 {}
 
-void EposCurrentMode::init(ros::NodeHandle &motor_nh, NodeHandle &node_handle)
+void EposCurrentMode::init(rclcpp::NodeHandle &motor_nh, NodeHandle &node_handle)
 {
     ControlModeBase::init(motor_nh, node_handle);
 }

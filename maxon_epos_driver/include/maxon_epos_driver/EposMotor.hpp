@@ -9,10 +9,10 @@
 #define _EposMotor_HPP
 
 #include <string>
-#include <ros/ros.h>
-#include <std_msgs/Float32.h>
-#include "maxon_epos_driver/Device.hpp"
-#include "maxon_epos_driver/control/ControlModeBase.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include "std_msgs/msg/float32.hpp"
+#include "Device.hpp"
+#include "control/ControlModeBase.hpp"
 #include "maxon_epos_msgs/MotorState.h"
 
 
@@ -21,20 +21,20 @@ public:
     EposMotor();
     virtual ~EposMotor();
 
-    void init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh,
+    void init(rclcpp::NodeHandle &root_nh, rclcpp::NodeHandle &motor_nh,
             const std::string &motor_name);
 
     maxon_epos_msgs::MotorState read();
     void write(const double position, const double velocity, const double current);
 
 private:
-    void initEposDeviceHandle(ros::NodeHandle &motor_nh);
+    void initEposDeviceHandle(rclcpp::NodeHandle &motor_nh);
     void initDeviceError();
-    void initProtocolStackChanges(ros::NodeHandle &motor_nh);
-    void initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh);
-    void initEncoderParams(ros::NodeHandle &motor_nh);
-    void initProfilePosition(ros::NodeHandle &motor_nh);
-    void initMiscParams(ros::NodeHandle &motor_nh);
+    void initProtocolStackChanges(rclcpp::NodeHandle &motor_nh);
+    void initControlMode(rclcpp::NodeHandle &root_nh, rclcpp::NodeHandle &motor_nh);
+    void initEncoderParams(rclcpp::NodeHandle &motor_nh);
+    void initProfilePosition(rclcpp::NodeHandle &motor_nh);
+    void initMiscParams(rclcpp::NodeHandle &motor_nh);
 
     double ReadPosition();
     double ReadVelocity();
@@ -58,8 +58,8 @@ private:
     double m_effort;
     double m_current;
 
-    ros::Publisher m_state_publisher;
-    ros::Subscriber m_state_subscriber;
+    rclcpp::Publisher m_state_publisher;
+    rclcpp::Subscriber m_state_subscriber;
 
     int m_max_qc;
     bool m_use_ros_unit;

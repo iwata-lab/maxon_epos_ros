@@ -13,7 +13,7 @@
 ControlModeBase::~ControlModeBase()
 {}
 
-void ControlModeBase::init(ros::NodeHandle &motor_nh, NodeHandle &node_handle)
+void ControlModeBase::init(rclcpp::NodeHandle &motor_nh, NodeHandle &node_handle)
 {
     m_epos_handle = node_handle;
     m_use_ros_unit = motor_nh.param("use_ros_unit", false);
