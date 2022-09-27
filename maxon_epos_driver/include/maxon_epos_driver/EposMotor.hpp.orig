@@ -11,9 +11,15 @@
 #include <string>
 #include <rclcpp/rclcpp.hpp>
 #include "std_msgs/msg/float32.hpp"
+<<<<<<< Updated upstream
+#include "Device.hpp"
+#include "control/ControlModeBase.hpp"
+#include "maxon_epos_msgs/MotorState.h"
+=======
 #include "maxon_epos_driver/Device.hpp"
 #include "maxon_epos_driver/control/ControlModeBase.hpp"
 #include "maxon_epos_msgs/msg/motor_state.hpp"
+>>>>>>> Stashed changes
 
 
 class EposMotor {
@@ -21,13 +27,26 @@ public:
     EposMotor();
     virtual ~EposMotor();
 
+<<<<<<< Updated upstream
+    void init(rclcpp::NodeHandle &root_nh, rclcpp::NodeHandle &motor_nh,
+=======
     void init(rclcpp::Node &root_nh, rclcpp::Node &motor_nh,
+>>>>>>> Stashed changes
             const std::string &motor_name);
 
     maxon_epos_msgs::msg::MotorState read();
     void write(const double position, const double velocity, const double current);
 
 private:
+<<<<<<< Updated upstream
+    void initEposDeviceHandle(rclcpp::NodeHandle &motor_nh);
+    void initDeviceError();
+    void initProtocolStackChanges(rclcpp::NodeHandle &motor_nh);
+    void initControlMode(rclcpp::NodeHandle &root_nh, rclcpp::NodeHandle &motor_nh);
+    void initEncoderParams(rclcpp::NodeHandle &motor_nh);
+    void initProfilePosition(rclcpp::NodeHandle &motor_nh);
+    void initMiscParams(rclcpp::NodeHandle &motor_nh);
+=======
     void initEposDeviceHandle(rclcpp::Node &motor_nh);
     void initDeviceError();
     void initProtocolStackChanges(rclcpp::Node &motor_nh);
@@ -35,6 +54,7 @@ private:
     void initEncoderParams(rclcpp::Node &motor_nh);
     void initProfilePosition(rclcpp::Node &motor_nh);
     void initMiscParams(rclcpp::Node &motor_nh);
+>>>>>>> Stashed changes
 
     double ReadPosition();
     double ReadVelocity();
@@ -58,8 +78,13 @@ private:
     double m_effort;
     double m_current;
 
+<<<<<<< Updated upstream
+    rclcpp::Publisher m_state_publisher;
+    rclcpp::Subscriber m_state_subscriber;
+=======
     rclcpp::Publisher<maxon_epos_msgs::msg::MotorState>::SharedPtr m_state_publisher;
     rclcpp::Subscription<maxon_epos_msgs::msg::MotorState>::SharedPtr m_state_subscriber;
+>>>>>>> Stashed changes
 
     int m_max_qc;
     bool m_use_ros_unit;

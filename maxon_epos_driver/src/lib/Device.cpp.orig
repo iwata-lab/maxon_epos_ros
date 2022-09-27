@@ -152,10 +152,17 @@ void* DeviceHandle::OpenSubDevice(const DeviceInfo &device_info, const std::shar
  */
 void DeviceHandle::CloseDevice(void* raw_device_ptr)
 {
+<<<<<<< Updated upstream
+    RCLCPP_INFO("Called CloseDevice");
+    unsigned int error_code;
+    if (VCS_CloseDevice(raw_device_ptr, &error_code) == VCS_FALSE) {
+        RCLCPP_ERROR_STREAM("CloseDevice (" + EposException::ToErrorInfo(error_code) + ")");
+=======
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Called CloseDevice");
     unsigned int error_code;
     if (VCS_CloseDevice(raw_device_ptr, &error_code) == VCS_FALSE) {
         RCLCPP_ERROR_STREAM(rclcpp::get_logger("rclcpp"), "CloseDevice (" + EposException::ToErrorInfo(error_code) + ")");
+>>>>>>> Stashed changes
     }
 }
 
@@ -166,10 +173,17 @@ void DeviceHandle::CloseDevice(void* raw_device_ptr)
  */
 void DeviceHandle::CloseSubDevice(void *raw_device_ptr)
 {
+<<<<<<< Updated upstream
+    RCLCPP_INFO("Called CloseSubDevice");
+    unsigned int error_code;
+    if (VCS_CloseSubDevice(raw_device_ptr, &error_code) == VCS_FALSE) {
+        RCLCPP_ERROR_STREAM("CloseSubDevice (" + EposException::ToErrorInfo(error_code) + ")");
+=======
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Called CloseSubDevice");
     unsigned int error_code;
     if (VCS_CloseSubDevice(raw_device_ptr, &error_code) == VCS_FALSE) {
         RCLCPP_ERROR_STREAM(rclcpp::get_logger("rclcpp"), "CloseSubDevice (" + EposException::ToErrorInfo(error_code) + ")");
+>>>>>>> Stashed changes
     }
 }
 
@@ -293,7 +307,11 @@ NodeHandle HandleManager::CreateEposHandle(const DeviceInfo &device_info, const 
         // check if handle already exists
         const std::shared_ptr<NodeHandle> existing_handle(existing_node_handles[node_info].lock());
         if (existing_handle) {
+<<<<<<< Updated upstream
+            RCLCPP_INFO("Found in existing handles");
+=======
             RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Found in existing handles");
+>>>>>>> Stashed changes
             return *existing_handle;
         }
 
@@ -310,7 +328,11 @@ NodeHandle HandleManager::CreateEposHandle(const DeviceInfo &device_info, const 
             return *sub_handle;
         }
     } catch (const EposException &e) {
+<<<<<<< Updated upstream
+        RCLCPP_ERROR_STREAM(e.what());
+=======
         RCLCPP_ERROR_STREAM(rclcpp::get_logger("rclcpp"), e.what());
+>>>>>>> Stashed changes
         throw EposException("Create EposHandle (Could not identify node)");
     }
 }

@@ -11,16 +11,25 @@
 EposProfilePositionMode::~EposProfilePositionMode()
 {}
 
+<<<<<<< Updated upstream
+void EposProfilePositionMode::init(rclcpp::NodeHandle &motor_nh, NodeHandle &node_handle)
+=======
 void EposProfilePositionMode::init(rclcpp::Node &motor_nh, NodeHandle &node_handle)
+>>>>>>> Stashed changes
 {
     ControlModeBase::init(motor_nh, node_handle);
 
     if (m_use_ros_unit) {
+<<<<<<< Updated upstream
+        rclcpp::NodeHandle encoder_nh(motor_nh, "encoder");
+        const int type(encoder_nh.param("type", 0));
+=======
         rclcpp::Node encoder_nh("encoder", motor_nh.get_name());
         encoder_nh.declare_parameter<int>("type",0);
         int type, resolution, gear_ratio;
         encoder_nh.get_parameter("type", type);
         // const int type(encoder_nh.get_parameter("type", 0));
+>>>>>>> Stashed changes
 
         if (type == 1 || type == 2) {
             // const int resolution(encoder_nh.get_parameter("resolution", 0));
@@ -64,13 +73,22 @@ void EposProfilePositionMode::read()
 void EposProfilePositionMode::write(const double position, const double velocity, const double current)
 {
     int quad_count;
+<<<<<<< Updated upstream
+    RCLCPP_DEBUG_STREAM("Target Position: " << position);
+    RCLCPP_DEBUG_STREAM("Encoder Resolution: " << m_max_qc);
+=======
     RCLCPP_DEBUG_STREAM(rclcpp::get_logger("encoder"), "Target Position: " << position);
     RCLCPP_DEBUG_STREAM(rclcpp::get_logger("encoder"), "Encoder Resolution: " << m_max_qc);
+>>>>>>> Stashed changes
     if (m_use_ros_unit) {
         quad_count = static_cast<int>((position / (2 * M_PI)) * m_max_qc);
     } else {
         quad_count = static_cast<int>(position);
     }
+<<<<<<< Updated upstream
+    RCLCPP_DEBUG_STREAM("Send Quad Count: " << quad_count);
+=======
     RCLCPP_DEBUG_STREAM(rclcpp::get_logger("encoder"), "Send Quad Count: " << quad_count);
+>>>>>>> Stashed changes
     VCS_NODE_COMMAND(MoveToPosition, m_epos_handle, quad_count, /* absolute */true, /* overwrite */true);
 }

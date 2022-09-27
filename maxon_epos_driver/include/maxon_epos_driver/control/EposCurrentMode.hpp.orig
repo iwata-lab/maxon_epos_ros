@@ -8,8 +8,13 @@
 #ifndef _EposCurrentMode_HPP
 #define _EposCurrentMode_HPP
 
+<<<<<<< Updated upstream
+#include "ControlModeBase.hpp"
+#include "../Device.hpp"
+=======
 #include "maxon_epos_driver/control/ControlModeBase.hpp"
 #include "maxon_epos_driver/Device.hpp"
+>>>>>>> Stashed changes
 #include <rclcpp/rclcpp.hpp>
 
 
@@ -17,7 +22,11 @@ class EposCurrentMode : public ControlModeBase {
 public:
     virtual ~EposCurrentMode();
 
+<<<<<<< Updated upstream
+    virtual void init(rclcpp::NodeHandle &motor_nh, NodeHandle &node_handle);
+=======
     virtual void init(rclcpp::Node &motor_nh, NodeHandle &node_handle);
+>>>>>>> Stashed changes
     virtual void activate();
     virtual void read();
     virtual void write(const double position, const double velocity, const double current);

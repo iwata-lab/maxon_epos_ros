@@ -11,7 +11,11 @@
 EposCurrentMode::~EposCurrentMode()
 {}
 
+<<<<<<< Updated upstream
+void EposCurrentMode::init(rclcpp::NodeHandle &motor_nh, NodeHandle &node_handle)
+=======
 void EposCurrentMode::init(rclcpp::Node &motor_nh, NodeHandle &node_handle)
+>>>>>>> Stashed changes
 {
     ControlModeBase::init(motor_nh, node_handle);
 }

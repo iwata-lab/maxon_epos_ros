@@ -13,8 +13,10 @@
 #include "maxon_epos_driver/control/EposProfileVelocityMode.hpp"
 #include "maxon_epos_driver/control/EposCurrentMode.hpp"
 
-#include "maxon_epos_msgs/MotorState.h"
+#include "maxon_epos_msgs/msg/motor_state.hpp"
 
+
+// TODO check if only declare_parameter is necessary
 /**
  * @brief Constructor
  */
@@ -31,12 +33,12 @@ EposMotor::~EposMotor()
     try {
         VCS_NODE_COMMAND_NO_ARGS(SetDisableState, m_epos_handle);
     } catch (const EposException &e) {
-        ROS_ERROR_STREAM(e.what());
+        RCLCPP_ERROR_STREAM(m_control_mode->nh->get_logger(), e.what());
     }
 }
 
 
-void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const std::string &motor_name)
+void EposMotor::init(rclcpp::Node &root_nh, rclcpp::Node &motor_nh, const std::string &motor_name)
 {
     m_motor_name = motor_name;
     initEposDeviceHandle(motor_nh);
@@ -52,11 +54,11 @@ void EposMotor::init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh, const 
 
     VCS_NODE_COMMAND_NO_ARGS(SetEnableState, m_epos_handle);
 
-    m_state_publisher = motor_nh.advertise<maxon_epos_msgs::MotorState>("get_state", 100);
-    m_state_subscriber = motor_nh.subscribe("set_state", 100, &EposMotor::writeCallback, this);
+    m_state_publisher = motor_nh.create_publisher<maxon_epos_msgs::msg::MotorState>("get_state", 100);
+    m_state_subscriber = motor_nh.create_subscription<maxon_epos_msgs::msg::MotorState>("set_state", 100, std::bind(&EposMotor::writeCallback, this, std::placeholders::_1));
 }
 
-maxon_epos_msgs::MotorState EposMotor::read()
+maxon_epos_msgs::msg::MotorState EposMotor::read()
 {
     try {
         if (m_control_mode) {
@@ -66,14 +68,14 @@ maxon_epos_msgs::MotorState EposMotor::read()
         m_velocity = ReadVelocity();
         m_current = ReadCurrent();
     } catch (const EposException &e) {
-        ROS_ERROR_STREAM(e.what());
+        RCLCPP_ERROR_STREAM(m_control_mode->nh->get_logger(), e.what());
     }
-    maxon_epos_msgs::MotorState msg;
+    maxon_epos_msgs::msg::MotorState msg;
     msg.motor_name = m_motor_name;
     msg.position = m_position;
     msg.velocity = m_velocity;
     msg.current = m_current;
-    m_state_publisher.publish(msg);
+    m_state_publisher->publish(msg);
     return msg;
 }
 
@@ -84,11 +86,11 @@ void EposMotor::write(const double position, const double velocity, const double
             m_control_mode->write(position, velocity, current);
         }
     } catch (const EposException &e) {
-        ROS_ERROR_STREAM(e.what());
+        RCLCPP_ERROR_STREAM(m_control_mode->nh->get_logger(), e.what());
     }
 }
 
-void EposMotor::writeCallback(const maxon_epos_msgs::MotorState::ConstPtr &msg)
+void EposMotor::writeCallback(const maxon_epos_msgs::msg::MotorState::SharedPtr msg)
 {
     write(msg->position, msg->velocity, msg->current);
 }
@@ -96,15 +98,21 @@ void EposMotor::writeCallback(const maxon_epos_msgs::MotorState::ConstPtr &msg)
 /**
  * @brief Initialize Epos Node Handle
  *
- * @param motor_nh ros NodeHandle of motor
+ * @param motor_nh rclcpp Node of motor
  */
-void EposMotor::initEposDeviceHandle(ros::NodeHandle &motor_nh)
+void EposMotor::initEposDeviceHandle(rclcpp::Node &motor_nh)
 {
-    const DeviceInfo device_info(motor_nh.param<std::string>("device", "EPOS4"),
-                                 motor_nh.param<std::string>("protocol_stack", "MAXON SERIAL V2"),
-                                 motor_nh.param<std::string>("interface", "USB"),
-                                 motor_nh.param<std::string>("port", "USB0"));
-    const unsigned short node_id(motor_nh.param("node_id", 0));
+    std::string device, protocol_stack, interface, port;
+    motor_nh.declare_parameter<std::string>("device", "EPOS4");
+    motor_nh.declare_parameter<std::string>("protocol_stack","MAXON SERIAL  V2");
+    motor_nh.declare_parameter<std::string>("interface", "USB");
+    motor_nh.declare_parameter<std::string>("port", "USB0");
+    motor_nh.get_parameter<std::string>("device", device);
+    motor_nh.get_parameter<std::string>("protocol_stack", protocol_stack);
+    motor_nh.get_parameter<std::string>("interface", interface);
+    motor_nh.get_parameter<std::string>("port", port);
+    const DeviceInfo device_info(device, protocol_stack, interface, port);
+    const unsigned short node_id(motor_nh.declare_parameter<unsigned short >("node_id", 0));
 
     // create epos handle
     m_epos_handle = HandleManager::CreateEposHandle(device_info, node_id);
@@ -121,7 +129,7 @@ void EposMotor::initDeviceError()
     for (int i = 1; i <= num_of_device_errors; i++) {
         unsigned int device_error_code;
         VCS_NODE_COMMAND(GetDeviceErrorCode, m_epos_handle, i, &device_error_code);
-        ROS_WARN_STREAM("EPOS Device Error: 0x" << std::hex << device_error_code);
+        RCLCPP_WARN_STREAM(m_control_mode->nh->get_logger(),"EPOS Device Error: 0x" << std::hex << device_error_code);
     }
 
     // Clear Errors
@@ -138,11 +146,11 @@ void EposMotor::initDeviceError()
  *
  * @param motor_nh ros NodeHandle of motor
  */
-void EposMotor::initProtocolStackChanges(ros::NodeHandle &motor_nh)
+void EposMotor::initProtocolStackChanges(rclcpp::Node &motor_nh)
 {
     // load values from ros parameter server
-    const unsigned int baudrate(motor_nh.param("baudrate", 0));
-    const unsigned int timeout(motor_nh.param("timeout", 0));
+    const unsigned int baudrate = (uint) motor_nh.declare_parameter<int>("baudrate", 0);
+    const unsigned int timeout = (uint) motor_nh.declare_parameter<int>("timeout", 0);
     if (baudrate == 0 && timeout == 0) {
         return;
     }
@@ -164,9 +172,9 @@ void EposMotor::initProtocolStackChanges(ros::NodeHandle &motor_nh)
  * @param root_nh NodeHandle of TopLevel
  * @param motor_nh NodeHandle of motor
  */
-void EposMotor::initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh)
+void EposMotor::initControlMode(rclcpp::Node &root_nh, rclcpp::Node &motor_nh)
 {
-    const std::string control_mode(motor_nh.param<std::string>("control_mode", "profile_position"));
+    const std::string control_mode(motor_nh.declare_parameter<std::string>("control_mode", "profile_position"));
     if (control_mode == "profile_position") {
         m_control_mode.reset(new EposProfilePositionMode());
     } else if (control_mode == "profile_velocity") {
@@ -184,23 +192,29 @@ void EposMotor::initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor
  *
  * @param motor_nh NodeHandle of motor
  */
-void EposMotor::initEncoderParams(ros::NodeHandle &motor_nh)
+void EposMotor::initEncoderParams(rclcpp::Node &motor_nh)
 {
-    ros::NodeHandle encoder_nh(motor_nh, "encoder");
+    rclcpp::Node encoder_nh("encoder", motor_nh.get_name());
     
-    const int type(encoder_nh.param("type", 0));
+    int type, resolution, gear_ratio;
+    encoder_nh.declare_parameter<int>("type",0);
+    encoder_nh.get_parameter("type", type);
     VCS_NODE_COMMAND(SetSensorType, m_epos_handle, type);
 
     if (type == 1 || type == 2) {
         // Incremental Encoder
-        const int resolution(encoder_nh.param("resolution", 0));
-        const int gear_ratio(encoder_nh.param("gear_ratio", 0));
+        encoder_nh.declare_parameter<int>("resolution",0);
+        encoder_nh.declare_parameter<int>("gear_ratio",0);
+        encoder_nh.get_parameter("resolution", resolution);
+        encoder_nh.get_parameter("gear_ratio", gear_ratio);
         if (resolution == 0 || gear_ratio == 0) {
             throw EposException("Please set parameter 'resolution' and 'gear_ratio'");
         }
-        const bool inverted_polarity(encoder_nh.param("inverted_polarity", false));
+        bool inverted_polarity;
+        encoder_nh.declare_parameter<bool>("inverted_poloarity",false);
+        encoder_nh.get_parameter("inverted_polarity", inverted_polarity);
         if (inverted_polarity) {
-            ROS_INFO_STREAM(m_motor_name + ": Inverted polarity is True");
+            RCLCPP_INFO_STREAM(m_control_mode->nh->get_logger(), m_motor_name + ": Inverted polarity is True");
         }
         VCS_NODE_COMMAND(SetIncEncoderParameter, m_epos_handle, resolution, inverted_polarity);
 
@@ -208,15 +222,15 @@ void EposMotor::initEncoderParams(ros::NodeHandle &motor_nh)
 
     } else if (type == 4 || type == 5) {
         // SSI Abs Encoder
-        bool inverted_polarity;
+        bool inverted_polarity = encoder_nh.declare_parameter<bool>("inverted_polarity", false);
         int data_rate, number_of_multiturn_bits, number_of_singleturn_bits;
-        encoder_nh.param("inverted_polarity", inverted_polarity, false);
-        if (encoder_nh.hasParam("data_rate") && encoder_nh.hasParam("number_of_singleturn_bits") && encoder_nh.hasParam("number_of_multiturn_bits")) {
-            encoder_nh.getParam("data_rate", data_rate);
-            encoder_nh.getParam("number_of_multiturn_bits", number_of_multiturn_bits);
-            encoder_nh.getParam("number_of_singleturn_bits", number_of_singleturn_bits);
+        
+        if (encoder_nh.has_parameter("data_rate") && encoder_nh.has_parameter("number_of_singleturn_bits") && encoder_nh.has_parameter("number_of_multiturn_bits")) {
+            encoder_nh.get_parameter("data_rate", data_rate);
+            encoder_nh.get_parameter("number_of_multiturn_bits", number_of_multiturn_bits);
+            encoder_nh.get_parameter("number_of_singleturn_bits", number_of_singleturn_bits);
         } else {
-            ROS_ERROR("Please set 'data_rate', 'number_of_singleturn_bits', and 'number_of_multiturn_bits'");
+            RCLCPP_ERROR(m_control_mode->nh->get_logger(), "Please set 'data_rate', 'number_of_singleturn_bits', and 'number_of_multiturn_bits'");
         }
         VCS_NODE_COMMAND(SetSsiAbsEncoderParameter, m_epos_handle, data_rate, number_of_multiturn_bits, number_of_singleturn_bits, inverted_polarity);
         m_max_qc = inverted_polarity ? -(1 << number_of_singleturn_bits) : (1 << number_of_singleturn_bits);
@@ -226,14 +240,14 @@ void EposMotor::initEncoderParams(ros::NodeHandle &motor_nh)
     }
 }
 
-void EposMotor::initProfilePosition(ros::NodeHandle &motor_nh)
+void EposMotor::initProfilePosition(rclcpp::Node &motor_nh)
 {
-    ros::NodeHandle profile_position_nh(motor_nh, "profile_position");
-    if (profile_position_nh.hasParam("velocity")) {
+    rclcpp::Node profile_position_nh("profile_position", motor_nh.get_name());
+    if (profile_position_nh.has_parameter("velocity")) {
         int velocity, acceleration, deceleration;
-        profile_position_nh.getParam("velocity", velocity);
-        profile_position_nh.getParam("acceleration", acceleration);
-        profile_position_nh.getParam("deceleration", deceleration);
+        profile_position_nh.get_parameter("velocity", velocity);
+        profile_position_nh.get_parameter("acceleration", acceleration);
+        profile_position_nh.get_parameter("deceleration", deceleration);
         VCS_NODE_COMMAND(SetPositionProfile, m_epos_handle, velocity, acceleration, deceleration);
     }
 }
@@ -243,10 +257,10 @@ void EposMotor::initProfilePosition(ros::NodeHandle &motor_nh)
  *
  * @param motor_nh NodeHandle of motor
  */
-void EposMotor::initMiscParams(ros::NodeHandle &motor_nh)
+void EposMotor::initMiscParams(rclcpp::Node &motor_nh)
 {
     // use ros unit or default epos unit
-    motor_nh.param("use_ros_unit", m_use_ros_unit, false);
+    m_use_ros_unit = motor_nh.declare_parameter<bool>("use_ros_unit", false);
 }
 
 

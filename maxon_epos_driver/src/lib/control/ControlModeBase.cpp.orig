@@ -13,7 +13,11 @@
 ControlModeBase::~ControlModeBase()
 {}
 
+<<<<<<< Updated upstream
+void ControlModeBase::init(rclcpp::NodeHandle &motor_nh, NodeHandle &node_handle)
+=======
 void ControlModeBase::init(rclcpp::Node &motor_nh, NodeHandle &node_handle)
+>>>>>>> Stashed changes
 {
     nh = std::make_shared<rclcpp::Node>(motor_nh.get_name());
     m_epos_handle = node_handle;

@@ -11,8 +11,13 @@
 #include <string>
 #include <vector>
 #include <rclcpp/rclcpp.hpp>
+<<<<<<< Updated upstream
+#include "EposMotor.hpp"
+#include "MotorStates.h"
+=======
 #include "maxon_epos_driver/EposMotor.hpp"
 #include "maxon_epos_msgs/msg/motor_states.hpp"
+>>>>>>> Stashed changes
 
 class EposManager {
 
@@ -20,7 +25,11 @@ public:
     EposManager();
     virtual ~EposManager();
 
+<<<<<<< Updated upstream
+    bool init(rclcpp::NodeHandle &root_nh, rclcpp::NodeHandle &motors_nh,
+=======
     bool init(rclcpp::Node &root_nh, rclcpp::Node &motors_nh,
+>>>>>>> Stashed changes
             const std::vector<std::string> &motor_names);
 
     void read();
@@ -29,8 +38,13 @@ public:
 
 private:
     std::vector<std::shared_ptr<EposMotor>> m_motors;
+<<<<<<< Updated upstream
+    rclcpp::Publisher m_all_motor_publisher;
+    rclcpp::Subscriber m_all_motor_subscriber;
+=======
     rclcpp::Publisher<maxon_epos_msgs::msg::MotorStates>::SharedPtr m_all_motor_publisher;
     rclcpp::Subscription<maxon_epos_msgs::msg::MotorStates>::SharedPtr m_all_motor_subscriber;
+>>>>>>> Stashed changes
 };
 
 #endif // _EposManager_HPP

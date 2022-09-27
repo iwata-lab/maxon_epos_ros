@@ -24,6 +24,10 @@ set(DEPENDENCIES
   "std_msgs"
   "maxon_epos_msgs"
 )
+<<<<<<< Updated upstream
+
+=======
+>>>>>>> Stashed changes
 
 
 include_directories(

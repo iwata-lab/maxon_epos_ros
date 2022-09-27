@@ -90,7 +90,7 @@ public:
  */
 struct CompareNodeInfo
 {
-    bool operator()(const NodeInfo &a, const NodeInfo &b)
+    bool operator()(const NodeInfo &a, const NodeInfo &b) const
     {
         if (a.device_name != b.device_name) {
             return a.device_name < b.device_name;

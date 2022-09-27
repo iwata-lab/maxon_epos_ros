@@ -10,8 +10,13 @@
 
 #include <string>
 #include <vector>
+<<<<<<< Updated upstream
+#include "rclcpp/rclcpp.hpp"
+#include "../Device.hpp"
+=======
 #include <rclcpp/rclcpp.hpp>
 #include "maxon_epos_driver/Device.hpp"
+>>>>>>> Stashed changes
 
 class ControlModeBase {
 public:
