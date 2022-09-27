@@ -1,5 +1,5 @@
 
-Header header
+std_msgs/Header header
 
 string motor_name
 
