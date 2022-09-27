@@ -9,8 +9,8 @@ v1.0.0 supports multiple EPOS device.<br/>
 ## How to use
 
 ### Install Maxon Linux driver
-Firstly you must install maxon official linux driver.<br/>
-For detail, please look at [this official pdf](http://academy.maxonjapan.co.jp/wp-content/uploads/manual/epos/EPOS_Command_Library.pdf)
+Firstly you must install maxon official linux driver. [Download EPOS Linux Library here](https://www.maxongroup.com/medias/sys_master/root/8994700394526/EPOS-Linux-Library-En.zip)<br/>
+For detail, please look at [this official pdf](https://www.maxongroup.com/medias/sys_master/8823917281310.pdf)
 
 ### How to build
 Then you have to download this package into your ROS workspace.
@@ -34,19 +34,19 @@ Otherwise, you can refer `maxon_epos_example` package's launch file.
 
 #### Topics
 
-- `~/<motor_name>/get_state` (msg: [maxon_epos_msgs/MotorState](maxon_epos_msgs/msg/MotorState.msg))
+- `~/<motor_name>/get_state` (msg: [maxon_epos_msgs/msg/MotorState](maxon_epos_msgs/msg/MotorState.msg))
 
     This topic keep publishing motor current state.
 
-- `~/<motor_name>/set_state` (msg: [maxon_epos_msgs/MotorState](maxon_epos_msgs/msg/MotorState.msg))
+- `~/<motor_name>/set_state` (msg: [maxon_epos_msgs/msg/MotorState](maxon_epos_msgs/msg/MotorState.msg))
 
     When you send the goal to epos, use this topic.
 
-- `~/get_all_state` (msg: [maxon_epos_msgs/MotorStates](maxon_epos_msgs/msg/MotorStates.msg))
+- `~/get_all_state` (msg: [maxon_epos_msgs/msg/MotorStates](maxon_epos_msgs/msg/MotorStates.msg))
 
     This topic keep publishing all motors current states.
 
-- `~/set_all_state` (msg: [maxon_epos_msgs/MotorStates](maxon_epos_msgs/msg/MotorStates.msg))
+- `~/set_all_state` (msg: [maxon_epos_msgs/msg/MotorStates](maxon_epos_msgs/msg/MotorStates.msg))
 
     When you send the goals to all epos motors, use this topic.
 
