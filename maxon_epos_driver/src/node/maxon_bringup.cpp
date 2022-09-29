@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
     rclcpp::Node::SharedPtr nh = std::make_shared<rclcpp::Node>("maxon_bringup");
-    rclcpp::Node private_nh("~");
+    rclcpp::Node private_nh("");
     nh->declare_parameter<std::vector<std::string>>("motor_names");
 
     std::vector<std::string> motor_names;

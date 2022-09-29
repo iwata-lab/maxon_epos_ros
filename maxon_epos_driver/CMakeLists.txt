@@ -66,8 +66,11 @@ install(DIRECTORY include/
   DESTINATION include)
 # ament_export_include_directories(include)
 
-install(TARGETS ${PROJECT_NAME}  maxon_bringup
+install(TARGETS ${PROJECT_NAME}
   DESTINATION lib)
+
+install(TARGETS maxon_bringup
+  DESTINATION lib/${PROJECT_NAME})
 
 # install(DIRECTORY launch
 #   DESTINATION share/${PROJECT_NAME}/)
