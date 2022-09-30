@@ -7,6 +7,9 @@ This package is **WIP** now.<br/>
 v1.0.0 supports multiple EPOS device.<br/>
 
 ## How to use
+**WARNING** --- The package maxon_epos_example has NOT been migrated to ROS2.</br>
+In the package maxon_epos_driver you can find an example of launch file and configuration file for runing one motor. </br>
+**VERY IMPORTANT** - Do not set the name of the node when using a launch file to execute the maxon_bringup node. This will rename all rclcpp::Node variables that it node generates and it will be unable to get the motor connection parameters correctly.
 
 ### Install Maxon Linux driver
 Firstly you must install maxon official linux driver. [Download EPOS Linux Library here](https://www.maxongroup.com/medias/sys_master/root/8994700394526/EPOS-Linux-Library-En.zip)<br/>
