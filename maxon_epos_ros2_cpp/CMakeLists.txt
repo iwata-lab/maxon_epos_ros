@@ -47,7 +47,7 @@ macro(add_node node_name node_src)
 endmacro() 
 
 # Create Cpp executable, create executable nodes here
-add_node(maxon_epos_driver ../maxon_epos_driver/src/node/maxon_bringup.cpp)
+# add_node(maxon_epos_driver ../maxon_epos_driver/src/node/maxon_bringup.cpp)
 #add_executable(maxon_epos_driver src/node/maxon_bringup.cpp)
  
 ament_export_dependencies(rclcpp)

@@ -38,10 +38,11 @@ bool EposManager::init(rclcpp::Node &root_nh, rclcpp::Node &motors_nh,
     {
         RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "Loading Epos: " << motor_name);
         // Copy constructor => ns = motors_nh's namespace + / + motor_name
-        rclcpp::Node motor_nh(motor_name, motors_nh.get_name());
+        rclcpp::Node motora_nh(motor_name);
+        RCLCPP_INFO(motora_nh.get_logger(), "Created new node: %s", motora_nh.get_name());
 
         std::shared_ptr<EposMotor> motor(new EposMotor());
-        motor->init(root_nh, motor_nh, motor_name);
+        motor->init(root_nh, motora_nh, motor_name);
         m_motors.push_back(motor);
     }
 

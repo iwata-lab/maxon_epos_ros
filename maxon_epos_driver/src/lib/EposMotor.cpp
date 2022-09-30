@@ -113,6 +113,13 @@ void EposMotor::initEposDeviceHandle(rclcpp::Node &motor_nh)
     motor_nh.get_parameter<std::string>("port", port);
     const DeviceInfo device_info(device, protocol_stack, interface, port);
     const unsigned short node_id(motor_nh.declare_parameter<unsigned short >("node_id", 0));
+    RCLCPP_WARN(motor_nh.get_logger(), "Node name: %s", motor_nh.get_name());
+    RCLCPP_WARN(motor_nh.get_logger(), "Node namespace: %s", motor_nh.get_namespace());
+    // motor_nh.declare_parameter<unsigned short >("node_id", 0);
+    // unsigned short node_id;
+    // motor_nh.get_parameter<unsigned short>("node_id", node_id);
+
+
 
     // create epos handle
     m_epos_handle = HandleManager::CreateEposHandle(device_info, node_id);

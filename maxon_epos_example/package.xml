@@ -14,6 +14,7 @@
 
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <build_depend>std_msgs</build_depend>
   <build_depend>rclcpp</build_depend>
   <build_depend>maxon_epos_msgs</build_depend>
   <exec_depend>rclcpp</exec_depend>

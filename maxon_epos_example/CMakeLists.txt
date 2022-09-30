@@ -39,17 +39,14 @@ include_directories(
 )
 
 # Macro to create nodes easily
-# macro(add_node node_name node_src)
+macro(add_node node_name node_src)
 
-#   add_executable("${node_name}" "${node_src}")
-#   ament_target_dependencies("${node_name}" ${dependencies})
+  add_executable("${node_name}" "${node_src}")
+  ament_target_dependencies("${node_name}" ${dependencies})
 
-# endmacro() 
+endmacro() 
 
-add_executable(${PROJECT_NAME}_node node/sample.cpp)
-ament_target_dependencies(${PROJECT_NAME}_node  ${dependencies})
-target_link_libraries(${PROJECT_NAME}_node maxon_epos_driver)
-
+add_node(${PROJECT_NAME}_node node/sample.cpp)
 
 
 install(DIRECTORY include/
@@ -59,6 +56,9 @@ install(TARGETS ${PROJECT_NAME}_node
   DESTINATION lib)
 
 install(DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/)
+
+install(DIRECTORY config
   DESTINATION share/${PROJECT_NAME}/)
 
 ament_package()

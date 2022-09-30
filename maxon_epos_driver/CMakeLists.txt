@@ -64,7 +64,7 @@ target_link_libraries(maxon_bringup maxon_epos_driver -lEposCmd)
 
 install(DIRECTORY include/
   DESTINATION include)
-# ament_export_include_directories(include)
+ament_export_include_directories(include)
 
 install(TARGETS ${PROJECT_NAME}
   DESTINATION lib)
@@ -72,8 +72,11 @@ install(TARGETS ${PROJECT_NAME}
 install(TARGETS maxon_bringup
   DESTINATION lib/${PROJECT_NAME})
 
-# install(DIRECTORY launch
-#   DESTINATION share/${PROJECT_NAME}/)
+install(DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/)
+
+install(DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}/)
 
 ament_package()
 
