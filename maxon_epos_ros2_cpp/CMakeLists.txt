@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(maxon_epos_example_cpp)
+project(maxon_epos_ros2_cpp)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -33,9 +33,9 @@ set(dependencies
 )
 
 include_directories(
-  maxon_epos_driver
   maxon_epos_msgs
-  ${ament_INCLUDE_DIRS}
+  maxon_epos_driver
+  maxon_epos_example
 )
 
 # Macro to create nodes easily
@@ -46,19 +46,15 @@ macro(add_node node_name node_src)
 
 endmacro() 
 
-add_node(${PROJECT_NAME}_node node/sample.cpp)
+# Create Cpp executable, create executable nodes here
+# add_node(maxon_epos_driver ../maxon_epos_driver/src/node/maxon_bringup.cpp)
+#add_executable(maxon_epos_driver src/node/maxon_bringup.cpp)
+ 
+ament_export_dependencies(rclcpp)
 
+#target_link_libraries(${PROJECT_NAME} maxon_epos_driver)
 
-install(DIRECTORY include/
-  DESTINATION include)
-
-install(TARGETS ${PROJECT_NAME}_node
-  DESTINATION lib)
-
-install(DIRECTORY launch
-  DESTINATION share/${PROJECT_NAME}/)
-
-install(DIRECTORY config
-  DESTINATION share/${PROJECT_NAME}/)
 
 ament_package()
+
+

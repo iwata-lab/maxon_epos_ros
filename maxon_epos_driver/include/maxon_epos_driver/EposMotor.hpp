@@ -9,11 +9,11 @@
 #define _EposMotor_HPP
 
 #include <string>
-#include <ros/ros.h>
-#include <std_msgs/Float32.h>
+#include <rclcpp/rclcpp.hpp>
+#include "std_msgs/msg/float32.hpp"
 #include "maxon_epos_driver/Device.hpp"
 #include "maxon_epos_driver/control/ControlModeBase.hpp"
-#include "maxon_epos_msgs/MotorState.h"
+#include "maxon_epos_msgs/msg/motor_state.hpp"
 
 
 class EposMotor {
@@ -21,26 +21,26 @@ public:
     EposMotor();
     virtual ~EposMotor();
 
-    void init(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh,
+    void init(rclcpp::Node &root_nh, rclcpp::Node &motor_nh,
             const std::string &motor_name);
 
-    maxon_epos_msgs::MotorState read();
+    maxon_epos_msgs::msg::MotorState read();
     void write(const double position, const double velocity, const double current);
 
 private:
-    void initEposDeviceHandle(ros::NodeHandle &motor_nh);
+    void initEposDeviceHandle(rclcpp::Node &motor_nh);
     void initDeviceError();
-    void initProtocolStackChanges(ros::NodeHandle &motor_nh);
-    void initControlMode(ros::NodeHandle &root_nh, ros::NodeHandle &motor_nh);
-    void initEncoderParams(ros::NodeHandle &motor_nh);
-    void initProfilePosition(ros::NodeHandle &motor_nh);
-    void initMiscParams(ros::NodeHandle &motor_nh);
+    void initProtocolStackChanges(rclcpp::Node &motor_nh);
+    void initControlMode(rclcpp::Node &root_nh, rclcpp::Node &motor_nh);
+    void initEncoderParams(rclcpp::Node &motor_nh);
+    void initProfilePosition(rclcpp::Node &motor_nh);
+    void initMiscParams(rclcpp::Node &motor_nh);
 
     double ReadPosition();
     double ReadVelocity();
     double ReadCurrent();
 
-    void writeCallback(const maxon_epos_msgs::MotorState::ConstPtr &msg);
+    void writeCallback(const maxon_epos_msgs::msg::MotorState::SharedPtr msg);
 
 private:
 
@@ -58,8 +58,8 @@ private:
     double m_effort;
     double m_current;
 
-    ros::Publisher m_state_publisher;
-    ros::Subscriber m_state_subscriber;
+    rclcpp::Publisher<maxon_epos_msgs::msg::MotorState>::SharedPtr m_state_publisher;
+    rclcpp::Subscription<maxon_epos_msgs::msg::MotorState>::SharedPtr m_state_subscriber;
 
     int m_max_qc;
     bool m_use_ros_unit;

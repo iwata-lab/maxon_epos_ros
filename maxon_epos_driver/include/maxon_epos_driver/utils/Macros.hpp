@@ -8,8 +8,8 @@
 #ifndef _Macros_HPP
 #define _Macros_HPP
 
-#include "maxon_epos_driver/utils/EposException.hpp"
-#include "maxon_epos_driver/Definitions.h"
+#include "EposException.hpp"
+#include "../Definitions.h"
 
 
 // range of node_id [1, 127]

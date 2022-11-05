@@ -10,14 +10,14 @@
 
 #include <string>
 #include <vector>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include "maxon_epos_driver/Device.hpp"
 
 class ControlModeBase {
 public:
     virtual ~ControlModeBase();
 
-    virtual void init(ros::NodeHandle &motor_nh, NodeHandle &node_handle);
+    virtual void init(rclcpp::Node &motor_nh, NodeHandle &node_handle);
 
     // activate operation mode
     virtual void activate() = 0;
@@ -28,6 +28,7 @@ public:
     // write commands of operation mode
     virtual void write(const double position, const double velocity, const double current) = 0;
 
+    rclcpp::Node::SharedPtr nh;
 protected:
     bool m_use_ros_unit;
     NodeHandle m_epos_handle;

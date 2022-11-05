@@ -13,8 +13,9 @@
 ControlModeBase::~ControlModeBase()
 {}
 
-void ControlModeBase::init(ros::NodeHandle &motor_nh, NodeHandle &node_handle)
+void ControlModeBase::init(rclcpp::Node &motor_nh, NodeHandle &node_handle)
 {
+    nh = std::make_shared<rclcpp::Node>(motor_nh.get_name());
     m_epos_handle = node_handle;
-    m_use_ros_unit = motor_nh.param("use_ros_unit", false);
+    m_use_ros_unit = nh->declare_parameter<bool>("use_ros_unit", false);
 }

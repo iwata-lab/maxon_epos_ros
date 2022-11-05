@@ -10,7 +10,7 @@
 #include "maxon_epos_driver/utils/Macros.hpp"
 #include "maxon_epos_driver/utils/EposException.hpp"
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <map>
 #include <boost/foreach.hpp>
 
@@ -152,10 +152,10 @@ void* DeviceHandle::OpenSubDevice(const DeviceInfo &device_info, const std::shar
  */
 void DeviceHandle::CloseDevice(void* raw_device_ptr)
 {
-    ROS_INFO("Called CloseDevice");
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Called CloseDevice");
     unsigned int error_code;
     if (VCS_CloseDevice(raw_device_ptr, &error_code) == VCS_FALSE) {
-        ROS_ERROR_STREAM("CloseDevice (" + EposException::ToErrorInfo(error_code) + ")");
+        RCLCPP_ERROR_STREAM(rclcpp::get_logger("rclcpp"), "CloseDevice (" + EposException::ToErrorInfo(error_code) + ")");
     }
 }
 
@@ -166,10 +166,10 @@ void DeviceHandle::CloseDevice(void* raw_device_ptr)
  */
 void DeviceHandle::CloseSubDevice(void *raw_device_ptr)
 {
-    ROS_INFO("Called CloseSubDevice");
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Called CloseSubDevice");
     unsigned int error_code;
     if (VCS_CloseSubDevice(raw_device_ptr, &error_code) == VCS_FALSE) {
-        ROS_ERROR_STREAM("CloseSubDevice (" + EposException::ToErrorInfo(error_code) + ")");
+        RCLCPP_ERROR_STREAM(rclcpp::get_logger("rclcpp"), "CloseSubDevice (" + EposException::ToErrorInfo(error_code) + ")");
     }
 }
 
@@ -285,7 +285,7 @@ NodeHandle HandleManager::CreateEposHandle(const DeviceInfo &device_info, const 
         throw EposException("Invalid node_id");
     }
 
-    NodeInfo node_info(device_info, node_id);
+    const NodeInfo node_info(device_info, node_id);
     // record existing handles
     static std::map<NodeInfo, std::weak_ptr<NodeHandle>, CompareNodeInfo> existing_node_handles;
 
@@ -293,7 +293,7 @@ NodeHandle HandleManager::CreateEposHandle(const DeviceInfo &device_info, const 
         // check if handle already exists
         const std::shared_ptr<NodeHandle> existing_handle(existing_node_handles[node_info].lock());
         if (existing_handle) {
-            ROS_INFO("Found in existing handles");
+            RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Found in existing handles");
             return *existing_handle;
         }
 
@@ -310,7 +310,7 @@ NodeHandle HandleManager::CreateEposHandle(const DeviceInfo &device_info, const 
             return *sub_handle;
         }
     } catch (const EposException &e) {
-        ROS_ERROR_STREAM(e.what());
+        RCLCPP_ERROR_STREAM(rclcpp::get_logger("rclcpp"), e.what());
         throw EposException("Create EposHandle (Could not identify node)");
     }
 }

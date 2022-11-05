@@ -10,14 +10,14 @@
 
 #include "maxon_epos_driver/control/ControlModeBase.hpp"
 #include "maxon_epos_driver/Device.hpp"
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 
 class EposCurrentMode : public ControlModeBase {
 public:
     virtual ~EposCurrentMode();
 
-    virtual void init(ros::NodeHandle &motor_nh, NodeHandle &node_handle);
+    virtual void init(rclcpp::Node &motor_nh, NodeHandle &node_handle);
     virtual void activate();
     virtual void read();
     virtual void write(const double position, const double velocity, const double current);

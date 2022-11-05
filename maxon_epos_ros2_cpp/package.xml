@@ -1,31 +1,28 @@
 <?xml version="1.0"?>
-<package format="3">
-  <name>maxon_epos_example_cpp</name>
+<package format="2">
+  <name>maxon_epos_ros2_cpp</name>
   <version>0.0.0</version>
-  <description>The maxon_epos_example package</description>
+  <description>The maxon_epos_ros2 package</description>
 
   <maintainer email="taross0524.ss@gmail.com">Ryutaro Matsumoto</maintainer>
-
+  <maintainer email="cristina.luna@live.com">Cristina Luna</maintainer>
 
   <license>MIT</license>
-
 
   <author email="taross0524.ss@gmail.com">Ryutaro Matsumoto</author>
 
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>rclcpp</build_depend>
-  <build_depend>maxon_epos_msgs</build_depend>
-  <exec_depend>rclcpp</exec_depend>
-  <exec_depend>maxon_epos_msgs</exec_depend>
-
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <depend>message_package</depend>
+  <depend>maxon_epos_msgs</depend>
   <depend>maxon_epos_driver</depend>
-
+  <depend>maxon_epos_example</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
     <build_type>ament_cmake</build_type>
+
   </export>
 </package>
